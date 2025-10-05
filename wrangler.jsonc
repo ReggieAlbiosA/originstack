@@ -19,12 +19,14 @@
 	},
 	"observability": {
 		"enabled": true
+	},
+	"placement": {
+		"mode": "smart"
 	}
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
 	 */
-	// "placement": { "mode": "smart" }
 	/**
 	 * Bindings
 	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
