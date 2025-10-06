@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
 
   experimental: {
     cssChunking: true,
+    webVitalsAttribution: ['CLS', 'LCP'],
   },
 
   async redirects() {
@@ -17,6 +18,8 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  typedRoutes: true,
 
 } satisfies NextConfig;
 

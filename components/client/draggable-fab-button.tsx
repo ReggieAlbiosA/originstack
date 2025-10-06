@@ -19,8 +19,8 @@ type MenuItem = {
 }
 
 const menuItems: MenuItem[] = [
-  { label: "React Fundamentals Demo", icon: SiReact, href: "/react-demo", type: "main" },
-  { label: "Next.js Fundamentals Demo", icon: SiNextdotjs, href: "/nextjs-demo", type: "main" },
+  { label: "React Demo", icon: SiReact, href: "/react-demo", type: "main" },
+  { label: "Next.js Demo", icon: SiNextdotjs, href: "/nextjs-demo", type: "main" },
 ]
 
 // Memoized corner highlights to prevent re-renders during dragging
@@ -255,7 +255,7 @@ export default function DraggableFavButton() {
       {/* Dropdown menu */}
       {menuOpen && !isDragging && (
         <div
-          className="dropdown-menu fixed w-56 dark:bg-neutral-900 bg-white overflow-hidden text-black dark:text-white border dark:border-neutral-700 border-neutral-200 rounded-lg shadow-lg z-[2999] animate-fade-in"
+          className="dropdown-menu fixed w-48 dark:bg-neutral-900 bg-white overflow-hidden text-black dark:text-white border dark:border-neutral-700 border-neutral-200 rounded-lg shadow-lg z-[2999] animate-fade-in"
           style={dropdownStyle}
         >
           <div className="">

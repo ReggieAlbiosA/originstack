@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { Route } from 'next';
 
 export default function SiteLogo() {
     return (
-        <Link href="/react-fundamentals-demo" className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 rounded-lg transition-transform duration-200 group-hover:scale-105">
+        <Link href={"/react-demo" as Route} className="flex  items-center gap-3 group">
+            <div className="flex items-center z-[9999] justify-center w-10 h-10 bg-gradient-to-br from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 rounded-lg transition-transform duration-200 group-hover:scale-105">
                 <svg
                     width="24"
                     height="24"
