@@ -2,12 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  devIndicators: false,
 
   experimental: {
     cssChunking: true,
     webVitalsAttribution: ['CLS', 'LCP'],
   },
+
+  devIndicators: false,
+  reactCompiler: true,
+  typedRoutes: true,
+
 
   async redirects() {
     return [
@@ -19,7 +23,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  typedRoutes: true,
 
 } satisfies NextConfig;
 

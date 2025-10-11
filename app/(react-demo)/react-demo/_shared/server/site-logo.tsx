@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Route } from 'next';
+import type { SC } from '@/types/general-types';
 
 export default function SiteLogo() {
     return (

@@ -3,11 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../../globals.css";
 import DraggableFavButton from "@/components/client/draggable-fab-button";
 import SiteLogo from "@/app/(react-demo)/react-demo/_shared/server/site-logo";
-import { LargeScreenThemeToggle } from "@/components/client/theme-toggle";
+import { LargeScreenThemeToggle } from "@/components/client/header/theme-toggle";
 import { ThemeProvider } from "next-themes";
 import { SiGithub } from "react-icons/si";
-import NavigationMenuDemo from "@/components/client/navigation-menu";
-import MenuButton from "@/components/originui/mobile-main-nav-menu";
+import CustomNavigationMenu from "@/components/client/header/custom-navigation-menu";
+import MenuButton from "@/components/client/header/mobile-main-nav-menu";
 import { navigationItems } from "@/app/(react-demo)/react-demo/_shared/data/value";
 
 const geistSans = Geist({
@@ -53,29 +53,28 @@ export default function RootLayout({
           disableTransitionOnChange
         >
 
-          <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
-            <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <header className="sticky top-0 left-0 right-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
+            <nav className=" mx-auto px-7 py-3 flex items-center justify-between">
               <div className="flex items-center gap-8">
                 <SiteLogo />
-                <NavigationMenuDemo items={navigationItems} className={hideOnMobileStyle} />
               </div>
 
-              <div className="flex items-center gap-4 ">
+              <div className="flex items-center gap-4 justify-between">
+                <CustomNavigationMenu items={navigationItems} className={hideOnMobileStyle} />
+                <div className="bg-zinc-300 dark:bg-zinc-700 h-6 w-[1px]" />
+
                 <a href="https://github.com/originstack/originstack" className={hideOnMobileStyle} target="_blank" rel="noopener noreferrer">
-                  <SiGithub className="w-6 h-6" />
+                  <SiGithub className="w-5.5 h-5.5" />
                 </a>
                 <LargeScreenThemeToggle className={hideOnMobileStyle} />
-
                 <MenuButton navigationItems={navigationItems} className={showOnMobileStyle} />
-
-
               </div>
+
             </nav>
           </header>
 
-          <main className="pt-20">
-            {children}
-          </main>
+          {children}
+
 
           <DraggableFavButton />
 

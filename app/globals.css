@@ -129,6 +129,11 @@ html {
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+* {
+  /* outline: 1px dashed red */
+}
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -137,4 +142,68 @@ html {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom Scrollbar Styling */
+/* For Webkit browsers (Chrome, Safari, Edge, Opera) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  /* zinc-300 */
+  border-radius: 10px;
+  border: 3px solid #ffffff;
+  /* Creates padding effect */
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+  /* zinc-400 */
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #71717a;
+  /* zinc-500 */
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  /* zinc-700 */
+  border: 3px solid #09090b;
+  /* zinc-950 */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+  /* zinc-600 */
+}
+
+.dark ::-webkit-scrollbar-thumb:active {
+  background: #71717a;
+  /* zinc-500 */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d8 transparent;
+  /* thumb track */
+}
+
+.dark * {
+  scrollbar-color: #3f3f46 transparent;
 }

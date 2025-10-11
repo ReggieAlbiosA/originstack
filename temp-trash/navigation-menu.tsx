@@ -39,8 +39,8 @@ export default function NavigationMenuDemo({ className, items }: NavigationMenuD
                             </NavigationMenuLink>
                         ) : item.type === "sub" && item.children ? (
                             <>
-                                <NavigationMenuTrigger>{item.label}</NavigationMenuTrigger>
-                                <NavigationMenuContent>
+                                <NavigationMenuTrigger >{item.label}</NavigationMenuTrigger>
+                                <NavigationMenuContent className="">
                                     <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                                         {item.children.map((child, childIndex) => (
                                             <ListItem

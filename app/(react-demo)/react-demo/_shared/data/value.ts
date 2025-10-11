@@ -1,5 +1,9 @@
-import type { NavItem } from "@/components/client/navigation-menu";
+import type { NavItem } from "@/components/client/header/custom-navigation-menu"
 
+/**
+ * Navigation items for React Demo header
+ * Used in the main navigation menu
+ */
 export const navigationItems: NavItem[] = [
     {
         label: "Learn",
@@ -45,7 +49,7 @@ export const navigationItems: NavItem[] = [
     },
     {
         label: "Demo",
-        href: "/react-demo",
+        href: "/react-demo/demo",
         type: "main",
     },
 ];
