@@ -16,19 +16,19 @@ export type NavItem = {
     type: "main" | "sub"
     description?: string
     children?: NavItem[]
+    dropdownContent?: React.ReactNode // New prop for custom dropdown content
 }
 
 interface CustomNavigationMenuProps {
     className?: string
     items: NavItem[]
-    dropDownContent?: React.ReactNode
 }
 
 // ============================================================================
 // Main Navigation Component
 // ============================================================================
 
-export default function CustomNavigationMenu({ className, items, dropDownContent }: CustomNavigationMenuProps) {
+export default function CustomNavigationMenu({ className, items }: CustomNavigationMenuProps) {
     const [openIndex, setOpenIndex] = React.useState<number | null>(null)
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null)
     const menuRef = React.useRef<HTMLDivElement>(null)
@@ -74,7 +74,10 @@ export default function CustomNavigationMenu({ className, items, dropDownContent
             <ul className="flex items-center gap-1">
                 {items.map((item, index) => {
                     const isOpen = openIndex === index
-                    const hasChildren = Boolean(item.type === "sub" && item.children && item.children.length > 0)
+                    const hasChildren = Boolean(
+                        item.type === "sub" &&
+                        (item.dropdownContent || (item.children && item.children.length > 0))
+                    )
 
                     return (
                         <li
@@ -114,37 +117,42 @@ export default function CustomNavigationMenu({ className, items, dropDownContent
                                         />
                                     </button>
 
-                                    {/* Dropdown Content */}
-                                    {isOpen && item.children && (
-                                        <div
-                                            className={cn(
-                                                "absolute right-0 top-full mt-1.5 w-auto z-50",
-                                                "origin-top-right",
-                                                "animate-in fade-in-0 zoom-in-95 duration-200",
-                                                "overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg"
-                                            )}
-                                            onMouseEnter={() => {
-                                                if (timeoutRef.current) {
-                                                    clearTimeout(timeoutRef.current)
-                                                }
-                                            }}
-                                        >
+                                    {/* Dropdown Content - Always rendered but hidden with CSS */}
+                                    <div
+                                        className={cn(
+                                            "absolute right-0 top-full mt-1.5 w-auto z-50",
+                                            "origin-top-right",
+                                            "overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg",
+                                            "transition-all duration-200",
+                                            isOpen
+                                                ? "opacity-100 visible scale-100"
+                                                : "opacity-0 invisible scale-95 pointer-events-none"
+                                        )}
+                                        onMouseEnter={() => {
+                                            if (timeoutRef.current) {
+                                                clearTimeout(timeoutRef.current)
+                                            }
+                                        }}
+                                    >
+                                        {/* Use custom dropdown content if provided, otherwise use default */}
+                                        {item.dropdownContent ? (
+                                            <div onClick={() => setOpenIndex(null)}>
+                                                {item.dropdownContent}
+                                            </div>
+                                        ) : (
                                             <ul className="grid w-[400px] gap-2 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                                                {item.children.map((child, childIndex) => (
-                                                    <ClientList onClick={() => setOpenIndex(null)}>
-                                                        <ListItem
-                                                            key={childIndex}
-                                                            title={child.label}
-                                                            href={child.href || "#"}
-                                                            description={child.description}
-                                                        // onClick={() => setOpenIndex(null)}
-                                                        />
-                                                    </ClientList>
+                                                {item.children?.map((child, childIndex) => (
+                                                    <ListItem
+                                                        key={childIndex}
+                                                        title={child.label}
+                                                        href={child.href || "#"}
+                                                        description={child.description}
+                                                        onClick={() => setOpenIndex(null)}
+                                                    />
                                                 ))}
                                             </ul>
-                                        </div>
-                                        // dropDownContent
-                                    )}
+                                        )}
+                                    </div>
                                 </>
                             ) : null}
                         </li>
@@ -159,29 +167,16 @@ export default function CustomNavigationMenu({ className, items, dropDownContent
 // List Item Component
 // ============================================================================
 
-interface ClientListProps {
-    onClick?: () => void
-    children: React.ReactNode
-}
-
-export function ClientList({ onClick, children }: ClientListProps) {
-    return (
-        <div onClick={onClick}>
-            {children}
-        </div>
-    )
-}
-
 interface ListItemProps {
     title: string
     description?: string
     href: string
+    onClick?: () => void
 }
 
-
-function ListItem({ title, description, href }: ListItemProps) {
+function ListItem({ title, description, href, onClick }: ListItemProps) {
     return (
-        <li>
+        <li onClick={onClick}>
             <Link
                 href={href as Route}
                 className={cn(
@@ -201,5 +196,3 @@ function ListItem({ title, description, href }: ListItemProps) {
         </li>
     )
 }
-
-

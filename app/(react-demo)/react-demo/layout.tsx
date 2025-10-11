@@ -9,6 +9,8 @@ import { SiGithub } from "react-icons/si";
 import CustomNavigationMenu from "@/components/client/header/custom-navigation-menu";
 import MenuButton from "@/components/client/header/mobile-main-nav-menu";
 import { navigationItems } from "@/app/(react-demo)/react-demo/_shared/data/value";
+import React from "react";
+import { NavItem } from "@/components/client/header/custom-navigation-menu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +36,8 @@ export default function RootLayout({
 
   const hideOnMobileStyle = "hidden md:flex";
   const showOnMobileStyle = "flex md:hidden";
+
+
 
 
   return (
