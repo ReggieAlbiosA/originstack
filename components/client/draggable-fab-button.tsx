@@ -247,54 +247,66 @@ export default function DraggableFavButton() {
         style={buttonStyle}
         onMouseDown={handleMouseDown}
         onClick={handleClick}
-        aria-label="Menu"
+        aria-label="Open navigation menu"
+        aria-expanded={menuOpen}
+        aria-controls="floating-menu"
       >
-        <Book size={15} />
+        <Book size={15} aria-hidden="true" />
       </button>
 
       {/* Dropdown menu */}
       {menuOpen && !isDragging && (
         <div
+          id="floating-menu"
           className="dropdown-menu fixed w-48 dark:bg-neutral-900 bg-white overflow-hidden text-black dark:text-white border dark:border-neutral-700 border-neutral-200 rounded-lg shadow-lg z-[2999] animate-fade-in"
           style={dropdownStyle}
+          role="menu"
+          aria-labelledby="menu-title"
         >
           <div className="">
-            <h3 className="font-semibold text-sm p-3">Menu</h3>
+            <h3 id="menu-title" className="font-semibold text-sm p-3">Menu</h3>
             <hr />
-            <ul className="space-y-1 text-sm">
+            <ul className="space-y-1 text-sm" role="menu">
               {menuItems.map((item, i) =>
                 item.type === "main" ? (
                   <li
                     key={i}
                     className="px-2 py-2  hover:bg-neutral-200 dark:hover:bg-neutral-800 cursor-pointer flex items-center gap-2"
+                    role="none"
                   >
-                    <item.icon size={14} />
-                    <a href={item.href}>{item.label}</a>
+                    <item.icon size={14} aria-hidden="true" />
+                    <a href={item.href} role="menuitem">{item.label}</a>
                   </li>
                 ) : (
-                  <li key={i} className="relative group">
+                  <li key={i} className="relative group" role="none">
                     <div
                       className="px-2 py-2 rounded-md dark:hover:bg-neutral-800 hover:bg-neutral-200 cursor-pointer flex items-center gap-2"
                       onClick={() => setSubMenuOpen(!subMenuOpen)}
+                      role="menuitem"
+                      aria-expanded={subMenuOpen}
+                      aria-haspopup="menu"
                     >
-                      <item.icon size={14} />
+                      <item.icon size={14} aria-hidden="true" />
                       {item.label}
-                      <ChevronRight className="ml-auto" size={14} />
+                      <ChevronRight className="ml-auto" size={14} aria-hidden="true" />
                     </div>
                     {/* Submenu */}
                     <ul
                       className={`absolute ml-1 max-w-max  dark:bg-neutral-800 bg-white border dark:border-neutral-700 border-neutral-200 rounded-md shadow-lg ${menuOpen && subMenuOpen ? "block" : "hidden"
                         }`}
                       style={submenuStyle}
+                      role="menu"
+                      aria-label={`${item.label} submenu`}
                     >
                       {item.children?.map((child, j) => (
                         <React.Fragment key={j}>
                           <li
                             key={j}
                             className="px-2 py-2.5 rounded-md whitespace-nowrap  dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-700 cursor-pointer flex items-center gap-2"
+                            role="none"
                           >
-                            <child.icon size={14} />
-                            <a href={child.href}>{child.label}</a>
+                            <child.icon size={14} aria-hidden="true" />
+                            <a href={child.href} role="menuitem">{child.label}</a>
                           </li>
                           {j !== (item.children?.length ?? 0) - 1 && (
                             <hr />

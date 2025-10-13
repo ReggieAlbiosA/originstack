@@ -96,12 +96,13 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
         <>
 
             <Button
-                className={`group ${className} z-[9999]`}
+                className={`group ${className} last-stack`}
                 variant="outline"
                 size="icon"
                 onClick={() => setOpen((prevState) => !prevState)}
                 aria-expanded={open}
                 aria-label={open ? "Close menu" : "Open menu"}
+                aria-controls="mobile-navigation-menu"
             >
                 <svg
                     className="pointer-events-none"
@@ -114,6 +115,7 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
                 >
                     <path
                         d="M4 12L20 12"
@@ -133,61 +135,67 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
             {open && (
                 <>
                     {pathname === "/react-demo" ? (
-                        <div className="fixed overflow-auto inset-0 bg-white dark:bg-zinc-900 px-5 pb-4 flex flex-col gap-3 w-screen h-screen z-[9998]">
+                        <div id="mobile-navigation-menu" className="fixed overflow-auto inset-0 bg-white dark:bg-zinc-900 px-5 pb-4 flex flex-col gap-3 w-screen h-screen z-[9998]" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">
                             <div className="sticky top-0 pt-18 bg-white dark:bg-zinc-900" />
 
                             <Button asChild>
-                                <a href="https://github.com/originstack/originstack" target="_blank" rel="noopener noreferrer">
-                                    <SiGithub className="w-6 h-6" />
+                                <a href="https://github.com/originstack/originstack" target="_blank" rel="noopener noreferrer" aria-label="Visit our GitHub repository">
+                                    <SiGithub className="w-6 h-6" aria-hidden="true" />
                                     <span>Github</span>
                                 </a>
                             </Button>
 
-                            <Accordion
-                                type="single"
-                                collapsible
-                                className="w-full "
-                            >
-                                {navigationItems.map((item, index) => (
-                                    item.type === "sub" && item.children ? (
-                                        <AccordionItem key={index} value={`item-${index}`} className={overrideAccordionItemClass}>
-                                            <AccordionTrigger
-                                                className={overrideAccordionTriggerClass}
-                                                overrideIcon={overrideAccordionTriggerIcon as React.ReactNode}
-                                            >
-                                                {item.label}
-                                            </AccordionTrigger>
-                                            <AccordionContent className={overrideAccordionContentClass}>
-                                                {item.children.map((child, childIndex) => (
-                                                    <Link
-                                                        key={childIndex}
-                                                        href={(child.href || "#") as Route}
-                                                        onClick={() => setOpen(false)}
-                                                        className="flex flex-col gap-1 py-2 px-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md"
-                                                    >
-                                                        <span className="font-medium text-sm">{child.label}</span>
-                                                        {child.description && (
-                                                            <span className="text-sm text-zinc-500 dark:text-zinc-400 text-balance">
-                                                                {child.description}
-                                                            </span>
-                                                        )}
-                                                    </Link>
-                                                ))}
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    ) : item.type === "main" && item.href ? (
-                                        <div key={index} className="py-1">
-                                            <Link
-                                                href={item.href as Route}
-                                                onClick={() => setOpen(false)}
-                                                className={`block ${overrideAccordionTriggerClass} font-medium`}
-                                            >
-                                                {item.label}
-                                            </Link>
-                                        </div>
-                                    ) : null
-                                ))}
-                            </Accordion>
+                            <nav role="navigation" aria-label="Mobile navigation">
+                                <Accordion
+                                    type="single"
+                                    collapsible
+                                    className="w-full "
+                                >
+                                    {navigationItems.map((item, index) => (
+                                        item.type === "sub" && item.children ? (
+                                            <AccordionItem key={index} value={`item-${index}`} className={overrideAccordionItemClass}>
+                                                <AccordionTrigger
+                                                    className={overrideAccordionTriggerClass}
+                                                    overrideIcon={overrideAccordionTriggerIcon as React.ReactNode}
+                                                >
+                                                    {item.label}
+                                                </AccordionTrigger>
+                                                <AccordionContent className={overrideAccordionContentClass}>
+                                                    <ul role="menu">
+                                                        {item.children.map((child, childIndex) => (
+                                                            <li key={childIndex} role="none">
+                                                                <Link
+                                                                    href={(child.href || "#") as Route}
+                                                                    onClick={() => setOpen(false)}
+                                                                    className="flex flex-col gap-1 py-2 px-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md"
+                                                                    role="menuitem"
+                                                                >
+                                                                    <span className="font-medium text-sm">{child.label}</span>
+                                                                    {child.description && (
+                                                                        <span className="text-sm text-zinc-500 dark:text-zinc-400 text-balance">
+                                                                            {child.description}
+                                                                        </span>
+                                                                    )}
+                                                                </Link>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        ) : item.type === "main" && item.href ? (
+                                            <div key={index} className="py-1">
+                                                <Link
+                                                    href={item.href as Route}
+                                                    onClick={() => setOpen(false)}
+                                                    className={`block ${overrideAccordionTriggerClass} font-medium`}
+                                                >
+                                                    {item.label}
+                                                </Link>
+                                            </div>
+                                        ) : null
+                                    ))}
+                                </Accordion>
+                            </nav>
 
                             <hr className="border-zinc-200 dark:border-zinc-800" />
 

@@ -70,8 +70,8 @@ export default function CustomNavigationMenu({ className, items }: CustomNavigat
     }
 
     return (
-        <nav ref={menuRef} className={cn("relative flex items-center", className)}>
-            <ul className="flex items-center gap-1">
+        <nav ref={menuRef} className={cn("relative flex items-center", className)} role="navigation" aria-label="Main navigation">
+            <ul className="flex items-center gap-1" role="menubar">
                 {items.map((item, index) => {
                     const isOpen = openIndex === index
                     const hasChildren = Boolean(
@@ -83,12 +83,14 @@ export default function CustomNavigationMenu({ className, items }: CustomNavigat
                         <li
                             key={index}
                             className="relative"
+                            role="none"
                             onMouseEnter={() => handleMouseEnter(index, hasChildren)}
                             onMouseLeave={handleMouseLeave}
                         >
                             {item.type === "main" && item.href ? (
                                 <Link
                                     href={item.href as Route}
+                                    role="menuitem"
                                     className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:ring-ring/50 transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
                                 >
                                     {item.label}
@@ -98,6 +100,8 @@ export default function CustomNavigationMenu({ className, items }: CustomNavigat
                                     <button
                                         onClick={() => handleTriggerClick(index, hasChildren)}
                                         aria-expanded={isOpen}
+                                        aria-haspopup="menu"
+                                        role="menuitem"
                                         className={cn(
                                             "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-[color,box-shadow]",
                                             "hover:bg-accent hover:text-accent-foreground",
@@ -119,6 +123,8 @@ export default function CustomNavigationMenu({ className, items }: CustomNavigat
 
                                     {/* Dropdown Content - Always rendered but hidden with CSS */}
                                     <div
+                                        role="menu"
+                                        aria-labelledby={`menu-trigger-${index}`}
                                         className={cn(
                                             "absolute right-0 top-full mt-1.5 w-auto z-50",
                                             "origin-top-right",
@@ -140,7 +146,7 @@ export default function CustomNavigationMenu({ className, items }: CustomNavigat
                                                 {item.dropdownContent}
                                             </div>
                                         ) : (
-                                            <ul className="grid w-[400px] gap-2 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                                            <ul className="grid w-[400px] gap-2 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]" role="menu">
                                                 {item.children?.map((child, childIndex) => (
                                                     <ListItem
                                                         key={childIndex}
@@ -176,9 +182,10 @@ interface ListItemProps {
 
 function ListItem({ title, description, href, onClick }: ListItemProps) {
     return (
-        <li onClick={onClick}>
+        <li onClick={onClick} role="none">
             <Link
                 href={href as Route}
+                role="menuitem"
                 className={cn(
                     "flex flex-col gap-1 rounded-sm p-2 text-sm transition-all outline-none",
                     "hover:bg-accent hover:text-accent-foreground",

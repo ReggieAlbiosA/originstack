@@ -22,20 +22,20 @@ export function LargeScreenThemeToggle({ className }: ThemeToggleProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" className={className} size="icon">
-                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                <Button variant="outline" className={className} size="icon" aria-label="Toggle theme">
+                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" aria-hidden="true" />
+                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" aria-hidden="true" />
                     <span className="sr-only">Toggle theme</span>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
+            <DropdownMenuContent align="end" role="menu" aria-label="Theme options">
+                <DropdownMenuItem onClick={() => setTheme("light")} role="menuitem">
                     Light
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                <DropdownMenuItem onClick={() => setTheme("dark")} role="menuitem">
                     Dark
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
+                <DropdownMenuItem onClick={() => setTheme("system")} role="menuitem">
                     System
                 </DropdownMenuItem>
             </DropdownMenuContent>
@@ -63,7 +63,7 @@ export function MobileThemeToggle({ className }: ThemeToggleProps) {
 
     return (
         <div className={className}>
-            <div className="flex items-center justify-center gap-1 bg-background rounded-md p-1 border w-full max-w-xs mx-auto">
+            <div className="flex items-center justify-center gap-1 bg-background rounded-md p-1 border w-full max-w-xs mx-auto" role="group" aria-label="Theme selection">
                 {options.map((option) => (
                     <button
                         key={option.value}
@@ -77,6 +77,7 @@ export function MobileThemeToggle({ className }: ThemeToggleProps) {
                         }
                         aria-pressed={theme === option.value}
                         title={option.label}
+                        aria-label={`Set theme to ${option.label}`}
                     >
                         {option.icon}
                         <span className="sr-only">{option.label}</span>

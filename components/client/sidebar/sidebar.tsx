@@ -58,8 +58,8 @@ export default function Sidebar({ config, className }: SidebarProps) {
         <aside className={cn(
             "w-70 h-[calc(100vh-66px)] sticky top-[65px] overflow-y-auto border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900",
             className
-        )}>
-            <nav className="p-4 space-y-6">
+        )} role="complementary" aria-label="Sidebar navigation">
+            <nav className="p-4 space-y-6" role="navigation" aria-label="Table of contents">
                 {config.sections.map((section, index) => (
                     <SidebarSectionComponent key={index} section={section} />
                 ))}
@@ -85,47 +85,50 @@ function SidebarSectionComponent({ section }: SidebarSectionComponentProps) {
     if (hasTitle) {
         if (isCollapsible) {
             return (
-                <div className="space-y-2">
+                <section className="space-y-2" aria-labelledby={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`}>
                     <button
                         onClick={() => setIsOpen(!isOpen)}
+                        aria-expanded={isOpen}
+                        aria-controls={`section-content-${section.title?.toLowerCase().replace(/\s+/g, '-')}`}
                         className="flex items-center justify-between w-full text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                     >
-                        <span>{section.title}</span>
+                        <span id={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`}>{section.title}</span>
                         <ChevronRight
                             className={cn(
                                 "w-3 h-3 transition-transform duration-200",
                                 isOpen && "rotate-90"
                             )}
+                            aria-hidden="true"
                         />
                     </button>
                     {isOpen && (
-                        <div className="space-y-1">
+                        <div id={`section-content-${section.title?.toLowerCase().replace(/\s+/g, '-')}`} className="space-y-1" role="region" aria-labelledby={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`}>
                             {section.items.map((item, index) => (
                                 <SidebarItemComponent key={index} item={item} />
                             ))}
                         </div>
                     )}
-                </div>
+                </section>
             )
         } else {
             return (
-                <div className="space-y-2">
-                    <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                <section className="space-y-2" aria-labelledby={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <h3 id={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`} className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                         {section.title}
-                    </div>
-                    <div className="space-y-1">
+                    </h3>
+                    <div className="space-y-1" role="region" aria-labelledby={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`}>
                         {section.items.map((item, index) => (
                             <SidebarItemComponent key={index} item={item} />
                         ))}
                     </div>
-                </div>
+                </section>
             )
         }
     }
 
     // No title - just render items
     return (
-        <div className="space-y-1">
+        <div className="space-y-1" role="region">
             {section.items.map((item, index) => (
                 <SidebarItemComponent key={index} item={item} />
             ))}
