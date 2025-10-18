@@ -4,14 +4,14 @@ import { Route } from 'next';
 export default function SiteLogo() {
     return (
         <Link href={"/react-demo" as Route} className="flex  items-center gap-3 group">
-            <div className="flex items-center last-stack justify-center w-10 h-10 bg-gradient-to-br from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 rounded-lg transition-transform duration-200 group-hover:scale-105">
+            <div className="flex items-center last-stack justify-center w-10 h-10 bg-gradient-to-br from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 rounded-lg transition-transform duration-200 group-hover:scale-105 ">
                 <svg
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="text-white dark:text-zinc-900"
+                    className="text-white dark:text-zinc-900 ninetynine-stack"
                 >
                     <path
                         d="M12 2L2 7L12 12L22 7L12 2Z"

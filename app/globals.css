@@ -129,7 +129,7 @@ html {
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
-* {
+*:not(.debug) {
   /* outline: 1px dashed red */
 }
 
@@ -208,8 +208,31 @@ html {
   scrollbar-color: #3f3f46 transparent;
 }
 
-
-
 .last-stack {
   z-index: 100;
 }
+
+.ninetynine-stack {
+  z-index: 99;
+}
+
+.ninetyeight-stack {
+  z-index: 98;
+}
+
+.ninetyseven-stack {
+  z-index: 97;
+}
+
+.ninetysix-stack {
+  z-index: 96;
+}
+
+.ninetyfive-stack {
+  z-index: 95;
+}
+
+
+/* .debug>* {
+  outline: 1px dashed greenyellow;
+} */

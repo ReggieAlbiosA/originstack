@@ -96,7 +96,7 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
         <>
 
             <Button
-                className={`group ${className} last-stack`}
+                className={`group ${className} ninetynine-stack`}
                 variant="outline"
                 size="icon"
                 onClick={() => setOpen((prevState) => !prevState)}
@@ -135,7 +135,7 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
             {open && (
                 <>
                     {pathname === "/react-demo" ? (
-                        <div id="mobile-navigation-menu" className="fixed overflow-auto inset-0 bg-white dark:bg-zinc-900 px-5 pb-4 flex flex-col gap-3 w-screen h-screen z-[9998]" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">
+                        <div id="mobile-navigation-menu" className="fixed overflow-auto inset-0 bg-white dark:bg-zinc-900 px-5 pb-4 flex flex-col gap-3 w-screen h-screen ninetyeight-stack" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">
                             <div className="sticky top-0 pt-18 bg-white dark:bg-zinc-900" />
 
                             <Button asChild>
@@ -206,7 +206,7 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
                         </div>
 
                     ) : pathname.startsWith("/react-demo/") && (
-                        <div className="fixed overflow-auto inset-0 bg-white dark:bg-zinc-900 px-5 pb-4 flex flex-col gap-3 w-screen h-screen z-[9998]">
+                        <div className="fixed overflow-auto inset-0 bg-white dark:bg-zinc-900 px-5 pb-4 flex flex-col gap-3 w-screen h-screen ninetyeight-stack">
                             <div className="sticky top-0 pt-18 bg-white dark:bg-zinc-900" />
 
                             <Button asChild>

@@ -126,7 +126,7 @@ export default function CustomNavigationMenu({ className, items }: CustomNavigat
                                         role="menu"
                                         aria-labelledby={`menu-trigger-${index}`}
                                         className={cn(
-                                            "absolute right-0 top-full mt-1.5 w-auto z-50",
+                                            "absolute sm:left-1/2 sm:-translate-x-1/2  top-full mt-1.5 w-auto z-50",
                                             "origin-top-right",
                                             "overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg",
                                             "transition-all duration-200",
