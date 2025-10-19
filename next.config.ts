@@ -1,17 +1,21 @@
 import type { NextConfig } from "next";
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const nextConfig: NextConfig = {
   /* config options here */
 
   experimental: {
     cssChunking: true,
     webVitalsAttribution: ['CLS', 'LCP'],
+    reactCompiler: true,
   },
 
   devIndicators: false,
-  reactCompiler: true,
   typedRoutes: true,
-
+  reactStrictMode: true,
 
   async redirects() {
     return [
@@ -26,7 +30,7 @@ const nextConfig: NextConfig = {
 
 } satisfies NextConfig;
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);
 
 // added by create cloudflare to enable calling `getCloudflareContext()` in `next dev`
 import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
