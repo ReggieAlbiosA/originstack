@@ -6,6 +6,7 @@ import { useState } from "react"
 import { usePathname } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { VersionNavigation } from "./version-navigation"
 
 // ============================================================================
 // Types
@@ -59,10 +60,14 @@ export default function Sidebar({ config, className }: SidebarProps) {
             "w-70 h-[calc(100vh-66px)] sticky top-[65px] overflow-y-auto border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900",
             className
         )} role="complementary" aria-label="Sidebar navigation">
-            <nav className="p-4 space-y-6" role="navigation" aria-label="Table of contents">
+            <nav className="p-4 py-6 space-y-6 flex flex-col " role="navigation" aria-label="Table of contents">
+
+                <VersionNavigation />
+
                 {config.sections.map((section, index) => (
                     <SidebarSectionComponent key={index} section={section} />
                 ))}
+
             </nav>
         </aside>
     )

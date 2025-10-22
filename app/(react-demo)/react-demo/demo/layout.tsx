@@ -16,10 +16,9 @@ export default function DemoLayout({
             {/* Main content */}
             <div className="flex-1 bg-white dark:bg-zinc-900">
                 {/* Page content */}
-                <div className="py-6 md:py-8 lg:py-12">
-                    <div className="w-full">
-                        {children}
-                    </div>
+
+                <div className="w-full">
+                    {children}
                 </div>
             </div>
 

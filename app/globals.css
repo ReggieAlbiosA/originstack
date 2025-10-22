@@ -51,6 +51,30 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Custom Text Selection Styling - Vercel Style (Inverted) */
+::selection {
+  background-color: rgba(0, 0, 0, 0.1);
+  /* Light mode: subtle black overlay */
+  color: inherit;
+}
+
+::-moz-selection {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+/* Dark mode selection - inverted to white */
+.dark ::selection {
+  background-color: rgba(255, 255, 255, 0.15);
+  /* Dark mode: subtle white overlay */
+  color: inherit;
+}
+
+.dark ::-moz-selection {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: inherit;
+}
+
 /* Light mode */
 :root {
   background-color: #ffffff;
@@ -87,6 +111,9 @@ html {
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
+
+
+  --header-height: 60px;
 }
 
 /* Dark mode */

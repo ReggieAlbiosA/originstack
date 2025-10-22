@@ -42,6 +42,22 @@ export const demoCallToAction = {
 }
 
 /**
+ * Page navigation for previous/next links
+ */
+export const demoPageNavigation = {
+    previous: {
+        label: "Previous Page",
+        title: "Introduction",
+        href: "/react-demo",
+    },
+    next: {
+        label: "Next Page",
+        title: "Installation",
+        href: "/react-demo/getting-started/installation",
+    },
+}
+
+/**
  * Sidebar configuration for React Demo
  * Used in the demo layout to display navigation
  */

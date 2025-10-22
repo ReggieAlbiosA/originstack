@@ -78,7 +78,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
     ));
 
     return (
-        <nav className="w-full" aria-label="Table of contents">
+        <nav className="w-full sticky top-25 pt-8" aria-label="Table of contents">
             <div className="flex items-center gap-2 mb-3">
                 <IconListSearch size={18} stroke={1.5} className="text-gray-700 dark:text-gray-300" />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">

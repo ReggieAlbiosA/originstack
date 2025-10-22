@@ -2,17 +2,13 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../../globals.css";
 import DraggableFavButton from "@/components/client/draggable-fab-button";
-import SiteLogo from "@/app/(react-demo)/react-demo/_shared/server/site-logo";
-import { LargeScreenThemeToggle } from "@/components/client/header/theme-toggle";
 import { ThemeProvider } from "next-themes";
-import { SiGithub } from "react-icons/si";
-import CustomNavigationMenu, { type NavItem } from "@/components/client/header/custom-navigation-menu";
-import MenuButton from "@/components/client/header/mobile-main-nav-menu";
+import Header from "@/components/composite-ui/header";
 import { navigationItems } from "@/app/(react-demo)/react-demo/_shared/data/value";
 import { type Route } from "next";
 import Link from "next/link";
-import CommandPalette from "@/components/client/header/search-interface";
 import { sidebarConfig } from "@/app/(react-demo)/react-demo/demo/_shared/data/value";
+import { type NavItem } from "@/components/client/header/custom-navigation-menu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +24,42 @@ export const metadata: Metadata = {
   title: "React Fundamentals Demo - Interactive Learning Platform",
   description: "Master React fundamentals through interactive demonstrations. Learn hooks, state management, performance optimization, and best practices with hands-on examples.",
 };
+
+// Logo component for the header
+function ReactDemoLogo(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M12 2L2 7L12 12L22 7L12 2Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2 17L12 22L22 17"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2 12L12 17L22 12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 // Server Component to render dropdown content
 function DropdownContent({ items }: { items: NavItem[] }) {
@@ -57,9 +89,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const hideOnMobileStyle = "hidden lg:flex";
-  const showOnMobileStyle = "flex lg:hidden";
-
   // Enhance navigation items with server-rendered dropdown content
   const enhancedNavItems = navigationItems.map((item) => {
     if (item.type === "sub" && item.children && item.children.length > 0) {
@@ -85,40 +114,21 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <header className="sticky top-0 left-0 right-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md" role="banner">
-            <nav className="mx-auto px-7 py-3 flex items-center justify-between" role="navigation" aria-label="Main navigation">
-              <div className="flex items-center gap-8">
-                <SiteLogo />
-              </div>
-              <div className="flex items-center gap-4 justify-between">
-                <CustomNavigationMenu
-                  items={enhancedNavItems}
-                  className={hideOnMobileStyle}
-                />
-
-                <div className={`bg-zinc-300 dark:bg-zinc-700 h-6 w-[1px] ${hideOnMobileStyle}`} aria-hidden="true" />
-
-                <CommandPalette docsItems={sidebarConfig} />
-
-                <div className="bg-zinc-300 dark:bg-zinc-700 h-6 w-[1px]" aria-hidden="true" />
-
-                <a
-                  href="https://github.com/originstack/originstack"
-                  className={hideOnMobileStyle}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Visit our GitHub repository"
-                >
-                  <SiGithub className="w-5.5 h-5.5" aria-hidden="true" />
-                </a>
-                <LargeScreenThemeToggle className={hideOnMobileStyle} />
-                <MenuButton
-                  navigationItems={navigationItems}
-                  className={showOnMobileStyle}
-                />
-              </div>
-            </nav>
-          </header>
+          {/* ✨ New Composite Header Component - 70% less code! */}
+          <Header
+            siteBrand={{
+              logo: ReactDemoLogo,
+              name: "React Demo",
+              description: "Fundamentals",
+              href: "/react-demo",
+            }}
+            navigationItems={enhancedNavItems}
+            searchDocsItems={sidebarConfig}
+            githubLink={{
+              href: "https://github.com/originstack/originstack",
+              ariaLabel: "Visit our GitHub repository",
+            }}
+          />
           {children}
           <DraggableFavButton />
         </ThemeProvider>

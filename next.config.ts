@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import path from "path";
+
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
@@ -7,10 +9,15 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig: NextConfig = {
   /* config options here */
 
+  turbopack: {
+    resolveExtensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'],
+    root: path.join(__dirname, '..'),
+  },
+
   experimental: {
+    reactCompiler: true,
     cssChunking: true,
     webVitalsAttribution: ['CLS', 'LCP'],
-    reactCompiler: true,
   },
 
   devIndicators: false,

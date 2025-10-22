@@ -70,7 +70,7 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
     // Track screen size for responsive accordion behavior
     useEffect(() => {
         const checkScreenSize = () => {
-            setIsLargeScreen(window.innerWidth >= 768) // md breakpoint
+            setIsLargeScreen(window.innerWidth >= 1024) // lg breakpoint (not md)
         }
 
         checkScreenSize()
