@@ -9,7 +9,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "..
 import { ChevronRightIcon } from "lucide-react"
 import { type NavItem } from "@/temp-trash/navigation-menu"
 import { SiGithub } from "react-icons/si"
-import { MobileThemeToggle } from "./theme-toggle"
+import { MobileViewThemeToggle } from "./theme-toggle"
 import { sidebarConfig } from "@/app/(react-demo)/react-demo/demo/_shared/data/value"
 import type { SidebarLinkItem, SidebarParentItem } from "@/components/client/sidebar/sidebar"
 
@@ -201,7 +201,7 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
 
                             <div className="flex justify-between">
                                 <span className="py-2 px-2 text-zinc-900 dark:text-zinc-100">Theme</span>
-                                <MobileThemeToggle />
+                                <MobileViewThemeToggle />
                             </div>
                         </div>
 
@@ -372,7 +372,7 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
 
                             <div className="flex justify-between">
                                 <span className="py-2 px-2 text-zinc-900 dark:text-zinc-100">Theme</span>
-                                <MobileThemeToggle />
+                                <MobileViewThemeToggle />
                             </div>
                         </div>
                     )}

@@ -6,7 +6,7 @@ import { useState } from "react"
 import { usePathname } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { VersionNavigation } from "./version-navigation"
+import VersionNavigation from "./version-navigation"
 
 // ============================================================================
 // Types
@@ -121,12 +121,12 @@ function SidebarSectionComponent({ section }: SidebarSectionComponentProps) {
                     <h3 id={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`} className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                         {section.title}
                     </h3>
-                    <div className="space-y-1" role="region" aria-labelledby={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <div className="space-y-2" role="region" aria-labelledby={`section-${section.title?.toLowerCase().replace(/\s+/g, '-')}`}>
                         {section.items.map((item, index) => (
                             <SidebarItemComponent key={index} item={item} />
                         ))}
                     </div>
-                </section>
+                </section >
             )
         }
     }

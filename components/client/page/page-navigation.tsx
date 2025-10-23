@@ -15,7 +15,7 @@ export interface PageNavigationProps {
     next?: PageNavigationLink
 }
 
-export function PageNavigation({ previous, next }: PageNavigationProps) {
+export default function PageNavigation({ previous, next }: PageNavigationProps) {
     return (
         <nav
             className="w-full border-t border-zinc-200 dark:border-zinc-800 pt-8 pb-12 mt-12"

@@ -7,7 +7,7 @@ import {
     demoConfigurationTypes,
     demoCallToAction,
     demoPageNavigation,
-} from "@/app/(react-demo)/react-demo/demo/_shared/data/value"
+} from "@/app/(nextjs-demo)/nextjs-demo/demo/_shared/data/value"
 
 // Generate table of contents based on page sections
 function getTableOfContents() {
@@ -51,7 +51,7 @@ export default function DemoPage() {
                                 <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
                                     Features
                                 </h2>
-                                <ul className="list-disc list-inside space-y-2 text-zinc-700 dark:text-zinc-300" role="list" aria-label="Sidebar component features">
+                                <ul className="list-disc list-inside space-y-2 text-zinc-700 dark:text-zinc-300" role="list" aria-label="Component features">
                                     {demoFeatures.map((feature, index) => (
                                         <li key={index} role="listitem">{feature}</li>
                                     ))}
@@ -109,3 +109,5 @@ export default function DemoPage() {
         </>
     )
 }
+
+

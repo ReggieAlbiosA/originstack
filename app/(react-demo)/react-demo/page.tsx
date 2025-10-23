@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { type Route } from "next";
-import { PageNavigation } from "@/components/client/page/page-navigation";
 
 export const metadata: Metadata = {
   title: "React Fundamentals Demo - Interactive Learning Platform",
@@ -342,16 +341,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Page Navigation */}
-      <div className="max-w-7xl mx-auto px-6">
-        <PageNavigation
-          next={{
-            label: "Next Page",
-            title: "Demo",
-            href: "/react-demo/demo"
-          }}
-        />
-      </div>
+
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800" role="contentinfo" aria-label="Site footer">

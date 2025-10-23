@@ -8,7 +8,7 @@ import { navigationItems } from "@/app/(react-demo)/react-demo/_shared/data/valu
 import { type Route } from "next";
 import Link from "next/link";
 import { sidebarConfig } from "@/app/(react-demo)/react-demo/demo/_shared/data/value";
-import { type NavItem } from "@/components/client/header/custom-navigation-menu";
+import { type NavItem } from "@/components/client/header/navigation-menu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

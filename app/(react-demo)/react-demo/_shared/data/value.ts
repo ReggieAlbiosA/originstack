@@ -1,4 +1,4 @@
-import type { NavItem } from "@/components/client/header/custom-navigation-menu"
+import type { NavItem } from "@/components/client/header/navigation-menu"
 
 /**
  * Navigation items for React Demo header

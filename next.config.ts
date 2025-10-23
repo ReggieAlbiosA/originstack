@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 import path from "path";
 
-
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
@@ -9,13 +8,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig: NextConfig = {
   /* config options here */
 
-  turbopack: {
-    resolveExtensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'],
-    root: path.join(__dirname, '..'),
-  },
+  // Required for OpenNext Cloudflare deployment
+  output: 'standalone',
+  reactCompiler: true,
 
   experimental: {
-    reactCompiler: true,
     cssChunking: true,
     webVitalsAttribution: ['CLS', 'LCP'],
   },
@@ -34,11 +31,11 @@ const nextConfig: NextConfig = {
     ];
   },
 
-
 } satisfies NextConfig;
 
 export default withBundleAnalyzer(nextConfig);
 
 // added by create cloudflare to enable calling `getCloudflareContext()` in `next dev`
 import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+
 initOpenNextCloudflareForDev();

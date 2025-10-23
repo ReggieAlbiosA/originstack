@@ -1,5 +1,5 @@
 import Sidebar from "@/components/composite-ui/sidebar"
-import { sidebarConfig } from "@/app/(react-demo)/react-demo/demo/_shared/data/value"
+import { sidebarConfig } from "@/app/(nextjs-demo)/nextjs-demo/demo/_shared/data/value"
 import VersionNavigation from "@/components/client/sidebar/version-navigation"
 
 export default function DemoLayout({
@@ -9,12 +9,12 @@ export default function DemoLayout({
 }) {
     return (
         <div className="flex min-h-screen bg-white dark:bg-zinc-900">
-            {/* Desktop Sidebar - hidden on mobile, visible on md and up */}
+            {/* Desktop Sidebar - hidden on mobile, visible on lg and up */}
             <aside className="hidden lg:block" role="complementary" aria-label="Table of contents">
-                {/* ✨ New Composite Sidebar Component - Cleaner & More Flexible! */}
+                {/* ✨ Composite Sidebar Component - Reusable & Flexible! */}
                 <Sidebar
                     config={sidebarConfig}
-                    header={<VersionNavigation />}
+                    header={<VersionNavigation versionLabel="Next.js 16.0.0" />}
                     sticky
                 />
             </aside>
@@ -28,3 +28,4 @@ export default function DemoLayout({
         </div>
     )
 }
+

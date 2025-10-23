@@ -1,5 +1,5 @@
 /**
- * Composite Header Component
+ * Composite Header Component (Server Component)
  *
  * A reusable, flexible header component that combines all navigation elements
  * into one cohesive interface. Designed for consistency across layouts while
@@ -7,20 +7,24 @@
  *
  * Features:
  * - Responsive design (mobile/desktop)
- * - Server-rendered dropdown content support
+ * - Server-rendered dropdown content support for SEO
  * - Integrated search, theme toggle, and navigation
  * - Accessible with ARIA labels
+ * - Pre-rendered on server for optimal SEO
  */
 
 import { type Route } from "next";
 import Link from "next/link";
-import CustomNavigationMenu, { type NavItem } from "@/components/client/header/custom-navigation-menu";
+import CustomNavigationMenu, { type NavItem } from "@/components/client/header/navigation-menu";
 import CommandPalette from "@/components/client/header/search-interface";
 import type { SidebarConfig } from "@/components/client/sidebar/sidebar";
 import { SiGithub } from "react-icons/si";
-import { LargeScreenThemeToggle } from "@/components/client/header/theme-toggle";
+import { DesktopViewThemeToggle } from "@/components/client/header/theme-toggle";
 import MenuButton from "@/components/client/header/mobile-main-nav-menu";
 import { type ReactNode } from "react";
+
+// This component is a Server Component by default (no "use client" directive)
+// It pre-renders SEO-important content like navigation links and branding
 
 // ==================== Type Definitions ====================
 
@@ -200,7 +204,7 @@ export default function Header({
 
                     {/* Theme Toggle */}
                     {showThemeToggle && (
-                        <LargeScreenThemeToggle className={hideOnMobile} />
+                        <DesktopViewThemeToggle className={hideOnMobile} />
                     )}
 
                     {/* Mobile Menu Button */}

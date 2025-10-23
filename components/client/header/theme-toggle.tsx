@@ -1,3 +1,11 @@
+/**
+ * Theme Toggle Components
+ *
+ * Contains both mobile and desktop variants of the theme toggle:
+ * - MobileViewThemeToggle: Button group style for mobile
+ * - DesktopViewThemeToggle: Dropdown menu style for desktop
+ */
+
 "use client"
 
 import * as React from "react"
@@ -12,11 +20,26 @@ import {
     DropdownMenuTrigger,
 } from "@/components/shadcn-ui/dropdown-menu"
 
+// ==================== Shared Types ====================
+
 interface ThemeToggleProps {
     className?: string
 }
 
-export function LargeScreenThemeToggle({ className }: ThemeToggleProps) {
+// ==================== Desktop View Component ====================
+
+/**
+ * Desktop View Theme Toggle
+ *
+ * A dropdown-based theme toggle for desktop screens.
+ * Provides Light, Dark, and System theme options.
+ *
+ * @example
+ * ```tsx
+ * <DesktopViewThemeToggle className="hidden lg:flex" />
+ * ```
+ */
+export function DesktopViewThemeToggle({ className }: ThemeToggleProps) {
     const { setTheme } = useTheme()
 
     return (
@@ -43,8 +66,20 @@ export function LargeScreenThemeToggle({ className }: ThemeToggleProps) {
     )
 }
 
+// ==================== Mobile View Component ====================
 
-export function MobileThemeToggle({ className }: ThemeToggleProps) {
+/**
+ * Mobile View Theme Toggle
+ *
+ * A button group style theme toggle for mobile screens.
+ * Shows icon-based theme options in a horizontal layout.
+ *
+ * @example
+ * ```tsx
+ * <MobileViewThemeToggle />
+ * ```
+ */
+export function MobileViewThemeToggle({ className }: ThemeToggleProps) {
     const { setTheme, theme } = useTheme()
 
     const options = [
@@ -87,3 +122,17 @@ export function MobileThemeToggle({ className }: ThemeToggleProps) {
         </div>
     )
 }
+
+// ==================== Legacy Exports (Deprecated) ====================
+
+/**
+ * @deprecated Use DesktopViewThemeToggle instead
+ * This export is maintained for backwards compatibility only
+ */
+export const LargeScreenThemeToggle = DesktopViewThemeToggle
+
+/**
+ * @deprecated Use MobileViewThemeToggle instead
+ * This export is maintained for backwards compatibility only
+ */
+export const MobileThemeToggle = MobileViewThemeToggle

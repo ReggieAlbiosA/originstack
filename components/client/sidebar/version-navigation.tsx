@@ -17,18 +17,24 @@ import {
     PopoverTrigger,
 } from "@/components/shadcn-ui/popover"
 
-const versions = [
-    {
-        value: "latest",
-        label: "Latest",
-        description: "React 19",
-        icon: Sparkles,
-    },
-]
+interface VersionNavigationProps {
+    versionLabel?: string
+}
 
-export function VersionNavigation() {
+export default function VersionNavigation({
+    versionLabel = "React 19"
+}: VersionNavigationProps) {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("latest")
+
+    const versions = [
+        {
+            value: "latest",
+            label: "Latest",
+            description: versionLabel,
+            icon: Sparkles,
+        },
+    ]
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
