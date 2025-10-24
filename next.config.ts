@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
@@ -10,16 +11,28 @@ const nextConfig: NextConfig = {
 
   // Required for OpenNext Cloudflare deployment
   output: 'standalone',
+
   reactCompiler: true,
+
+  // turbopack: {
+  //   root: path.resolve(__dirname, '..'),
+  // },
 
   experimental: {
     cssChunking: true,
     webVitalsAttribution: ['CLS', 'LCP'],
+    globalNotFound: true,
   },
+
 
   devIndicators: false,
   typedRoutes: true,
   reactStrictMode: true,
+
+  compiler: {
+    styledComponents: true,
+    // reactRemoveProperties: true,
+  },
 
   async redirects() {
     return [

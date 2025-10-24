@@ -15,7 +15,7 @@
 
 import { type Route } from "next";
 import Link from "next/link";
-import CustomNavigationMenu, { type NavItem } from "@/components/client/header/navigation-menu";
+import NavigationMenu, { type NavItem } from "@/components/client/header/navigation-menu";
 import CommandPalette from "@/components/client/header/search-interface";
 import type { SidebarConfig } from "@/components/client/sidebar/sidebar";
 import { SiGithub } from "react-icons/si";
@@ -185,7 +185,7 @@ export default function Header({
                 {/* Right Section: Navigation + Actions */}
                 <div className="flex items-center gap-4">
                     {/* Desktop Navigation */}
-                    <CustomNavigationMenu
+                    <NavigationMenu
                         items={navigationItems}
                         className={hideOnMobile}
                     />
@@ -211,6 +211,8 @@ export default function Header({
                     {showMobileMenu && (
                         <MenuButton
                             navigationItems={navigationItems}
+                            githubLink={githubLink}
+                            showSimpleMenu={true}
                             className={showOnMobile}
                         />
                     )}
