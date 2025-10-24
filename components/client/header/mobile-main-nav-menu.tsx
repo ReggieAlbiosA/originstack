@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/shadcn-ui/button"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../../shadcn-ui/accordion"
 import { ChevronRightIcon } from "lucide-react"
-import { type NavItem } from "@/temp-trash/navigation-menu"
+import { type NavItem } from "@/components/client/header/navigation-menu"
 import { SiGithub } from "react-icons/si"
 import { MobileViewThemeToggle } from "./theme-toggle"
 import { sidebarConfig } from "@/app/(react-demo)/react-demo/demo/_shared/data/value"
@@ -16,6 +16,11 @@ import type { SidebarLinkItem, SidebarParentItem } from "@/components/client/sid
 interface MenuButtonProps {
     className?: string
     navigationItems?: NavItem[]
+    githubLink?: {
+        href: string
+        ariaLabel?: string
+    }
+    showSimpleMenu?: boolean // If true, show simple menu with navigation items only
 }
 
 // Type guard to check if an item is a parent item with children
@@ -23,7 +28,15 @@ function isParentItem(item: SidebarLinkItem | SidebarParentItem): item is Sideba
     return 'children' in item && Array.isArray(item.children)
 }
 
-export default function MobileMainNavMenu({ className, navigationItems = [] }: MenuButtonProps) {
+export default function MobileMainNavMenu({
+    className,
+    navigationItems = [],
+    githubLink = {
+        href: "https://github.com/originstack/originstack",
+        ariaLabel: "Visit our GitHub repository"
+    },
+    showSimpleMenu = true
+}: MenuButtonProps) {
     const [open, setOpen] = useState<boolean>(false)
     const [isLargeScreen, setIsLargeScreen] = useState<boolean>(false)
 
@@ -134,12 +147,12 @@ export default function MobileMainNavMenu({ className, navigationItems = [] }: M
 
             {open && (
                 <>
-                    {pathname === "/react-demo" ? (
+                    {showSimpleMenu ? (
                         <div id="mobile-navigation-menu" className="fixed overflow-auto inset-0 bg-white dark:bg-zinc-900 px-5 pb-4 flex flex-col gap-3 w-screen h-screen ninetyeight-stack" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">
                             <div className="sticky top-0 pt-18 bg-white dark:bg-zinc-900" />
 
                             <Button asChild>
-                                <a href="https://github.com/originstack/originstack" target="_blank" rel="noopener noreferrer" aria-label="Visit our GitHub repository">
+                                <a href={githubLink.href} target="_blank" rel="noopener noreferrer" aria-label={githubLink.ariaLabel || "Visit our GitHub repository"}>
                                     <SiGithub className="w-6 h-6" aria-hidden="true" />
                                     <span>Github</span>
                                 </a>

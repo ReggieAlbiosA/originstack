@@ -28,7 +28,7 @@ interface CustomNavigationMenuProps {
 // Main Navigation Component
 // ============================================================================
 
-export default function CustomNavigationMenu({ className, items }: CustomNavigationMenuProps) {
+export default function NavigationMenu({ className, items }: CustomNavigationMenuProps) {
     const [openIndex, setOpenIndex] = React.useState<number | null>(null)
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null)
     const menuRef = React.useRef<HTMLDivElement>(null)

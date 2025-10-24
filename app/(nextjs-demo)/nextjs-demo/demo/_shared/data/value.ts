@@ -70,75 +70,75 @@ export const sidebarConfig: SidebarConfig = {
             items: [
                 {
                     label: "Installation",
-                    href: "/nextjs-demo/getting-started/installation",
+                    href: "/nextjs-demo/demo/getting-started/installation",
                 },
                 {
                     label: "Project Structure",
-                    href: "/nextjs-demo/getting-started/project-structure",
+                    href: "/nextjs-demo/demo/getting-started/project-structure",
                 },
                 {
                     label: "Layouts and Pages",
-                    href: "/nextjs-demo/getting-started/layouts-and-pages",
+                    href: "/nextjs-demo/demo/getting-started/layouts-and-pages",
                 },
                 {
                     label: "Linking and Navigating",
-                    href: "/nextjs-demo/getting-started/linking-and-navigating",
+                    href: "/nextjs-demo/demo/getting-started/linking-and-navigating",
                 },
                 {
                     label: "Server and Client Components",
-                    href: "/nextjs-demo/getting-started/server-and-client-components",
+                    href: "/nextjs-demo/demo/getting-started/server-and-client-components",
                 },
                 {
                     label: "Cache Components",
-                    href: "/nextjs-demo/getting-started/cache-components",
+                    href: "/nextjs-demo/demo/getting-started/cache-components",
                 },
                 {
                     label: "Fetching Data",
-                    href: "/nextjs-demo/getting-started/fetching-data",
+                    href: "/nextjs-demo/demo/getting-started/fetching-data",
                 },
                 {
                     label: "Updating Data",
-                    href: "/nextjs-demo/getting-started/updating-data",
+                    href: "/nextjs-demo/demo/getting-started/updating-data",
                 },
                 {
                     label: "Caching and Revalidating",
-                    href: "/nextjs-demo/getting-started/caching-and-revalidating",
+                    href: "/nextjs-demo/demo/getting-started/caching-and-revalidating",
                 },
                 {
                     label: "Error Handling",
-                    href: "/nextjs-demo/getting-started/error-handling",
+                    href: "/nextjs-demo/demo/getting-started/error-handling",
                 },
                 {
                     label: "CSS",
-                    href: "/nextjs-demo/getting-started/css",
+                    href: "/nextjs-demo/demo/getting-started/css",
                 },
                 {
                     label: "Image Optimization",
-                    href: "/nextjs-demo/getting-started/image-optimization",
+                    href: "/nextjs-demo/demo/getting-started/image-optimization",
                 },
                 {
                     label: "Font Optimization",
-                    href: "/nextjs-demo/getting-started/font-optimization",
+                    href: "/nextjs-demo/demo/getting-started/font-optimization",
                 },
                 {
                     label: "Metadata and OG images",
-                    href: "/nextjs-demo/getting-started/metadata-og-images",
+                    href: "/nextjs-demo/demo/getting-started/metadata-og-images",
                 },
                 {
                     label: "Route Handlers",
-                    href: "/nextjs-demo/getting-started/route-handlers",
+                    href: "/nextjs-demo/demo/getting-started/route-handlers",
                 },
                 {
                     label: "Proxy",
-                    href: "/nextjs-demo/getting-started/proxy",
+                    href: "/nextjs-demo/demo/getting-started/proxy",
                 },
                 {
                     label: "Deploying",
-                    href: "/nextjs-demo/getting-started/deploying",
+                    href: "/nextjs-demo/demo/getting-started/deploying",
                 },
                 {
                     label: "Upgrading",
-                    href: "/nextjs-demo/getting-started/upgrading",
+                    href: "/nextjs-demo/demo/getting-started/upgrading",
                 },
             ],
         },
