@@ -329,3 +329,4 @@ const items = [{ id: "fixed", ... }] // Generate from content instead
 
 **Result:** Clean, maintainable, and organized TOC components in a single file! 🎉
 
+

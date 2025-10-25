@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function NotFound() {
     return (
-        <div className="relative min-h-screen w-full bg-white dark:bg-zinc-900 flex items-center justify-center p-6">
+        <div className="relative min-h-[calc(100vh-65px)] w-full bg-white dark:bg-zinc-900 flex items-center justify-center p-6">
             {/* Subtle gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950"></div>
 

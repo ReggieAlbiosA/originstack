@@ -12,21 +12,22 @@ const nextConfig: NextConfig = {
   // Required for OpenNext Cloudflare deployment
   output: 'standalone',
 
-  reactCompiler: true,
 
   // turbopack: {
   //   root: path.resolve(__dirname, '..'),
   // },
 
+  typedRoutes: true,
+
   experimental: {
     cssChunking: true,
+    reactCompiler: true,
     webVitalsAttribution: ['CLS', 'LCP'],
     globalNotFound: true,
   },
 
 
   devIndicators: false,
-  typedRoutes: true,
   reactStrictMode: true,
 
   compiler: {
