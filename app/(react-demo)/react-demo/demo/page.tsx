@@ -1,5 +1,5 @@
-import { DesktopViewTableOfContents, MobileViewTableOfContents } from "@/components/client/page/table-of-contents"
-import PageNavigation from "@/components/client/page/page-navigation"
+import { DesktopViewTableOfContents, MobileViewTableOfContents } from "@/components/page/client/table-of-contents"
+import PageNavigation from "@/components/page/server/page-navigation"
 import {
     demoPageTitle,
     demoPageDescription,

@@ -1,4 +1,4 @@
-import type { NavItem } from "@/components/client/header/navigation-menu"
+import type { NavItem } from "@/components/header/client/navigation-menu"
 
 /**
  * Navigation items for Next.js Demo header

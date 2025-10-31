@@ -1,6 +1,6 @@
-import Sidebar from "@/components/composite-ui/sidebar"
+import Sidebar from "@/components/composite-ui/client/sidebar"
 import { sidebarConfig } from "@/app/(nextjs-demo)/nextjs-demo/demo/_shared/data/value"
-import VersionNavigation from "@/components/client/sidebar/version-navigation"
+import VersionNavigation from "@/components/sidebar/client/version-navigation"
 
 export default function DemoLayout({
     children,

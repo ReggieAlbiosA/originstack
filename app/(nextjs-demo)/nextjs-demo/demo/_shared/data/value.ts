@@ -1,4 +1,4 @@
-import type { SidebarConfig } from "@/components/client/sidebar/sidebar"
+import type { SidebarConfig } from "@/components/sidebar/client/sidebar"
 
 /**
  * Demo page content values

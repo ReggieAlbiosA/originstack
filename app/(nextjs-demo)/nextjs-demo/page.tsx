@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { type Route } from "next";
 
+
 export const metadata: Metadata = {
   title: "Next.js Demo - Modern Full-Stack Framework",
   description: "Master Next.js through interactive demonstrations. Learn App Router, Server Components, data fetching, and optimization techniques with hands-on examples.",
@@ -70,7 +71,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function HomePage() {
+  "use cache"
   return (
     <main className="min-h-screen bg-white dark:bg-zinc-900" role="main" aria-label="Next.js full-stack learning platform">
       {/* Hero Section */}

@@ -1,55 +1,49 @@
 import type { NextConfig } from "next";
-import path from "path";
-
-
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+// import path from "path";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-
-  // Required for OpenNext Cloudflare deployment
-  output: 'standalone',
-
 
   // turbopack: {
   //   root: path.resolve(__dirname, '..'),
   // },
 
   typedRoutes: true,
+  reactCompiler: true,
+  cacheComponents: true,
+  reactStrictMode: true,
+
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
 
   experimental: {
     cssChunking: true,
-    reactCompiler: true,
     webVitalsAttribution: ['CLS', 'LCP'],
     globalNotFound: true,
+
   },
 
-
-  devIndicators: false,
-  reactStrictMode: true,
 
   compiler: {
     styledComponents: true,
-    // reactRemoveProperties: true,
   },
+
 
   async redirects() {
     return [
       {
-        source: '/',              // The root route
-        destination: '/nextjs-demo',     // The desired new default route
-        permanent: true,          // Use true for permanent (301) redirect, false for temporary (307)
+        source: '/',
+        destination: '/nextjs-demo',
+        permanent: true,
       },
     ];
   },
 
 } satisfies NextConfig;
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 export default withBundleAnalyzer(nextConfig);
 
-// added by create cloudflare to enable calling `getCloudflareContext()` in `next dev`
 import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
-
 initOpenNextCloudflareForDev();

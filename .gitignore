@@ -45,7 +45,15 @@ next-env.d.ts
 !.env.example
 
 
-notes.txt
 /ts-fundamentals
 /temp-trash
 /types
+/lib/generated/prisma
+/app/(hosting-calculator)
+/components/hosting-calculator
+
+notes.txt
+cloudflare-pricing.html
+vercel-pricing.html
+COMMON_COMMANDS.md
+
