@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Search, FileText, Hash, Star, X } from 'lucide-react';
 import Link from 'next/link';
 import { Route } from 'next';
-import type { SidebarConfig, SidebarLinkItem, SidebarParentItem } from '@/components/sidebar/client/sidebar';
+import type { SidebarConfig, SidebarLinkItem, SidebarParentItem } from '@/components/sidebar/reusable/sidebar';
 
 // Define interface for search result items
 interface SearchResultItem {

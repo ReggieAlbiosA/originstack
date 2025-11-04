@@ -21,7 +21,7 @@ interface VersionNavigationProps {
     versionLabel?: string
 }
 
-export default function VersionNavigation({
+export function VersionNavigation({
     versionLabel = "React 19"
 }: VersionNavigationProps) {
     const [open, setOpen] = useState(false)

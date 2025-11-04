@@ -49,7 +49,7 @@ next-env.d.ts
 /temp-trash
 /types
 /lib/generated/prisma
-/app/(hosting-calculator)
+# /app/(hosting-calculator)
 /components/hosting-calculator
 
 notes.txt
