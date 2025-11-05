@@ -32,22 +32,38 @@ function VercelCalculator() {
     ]
 
     return (
-        <CalculatorLayout className="grid !grid-cols-[1.5fr_0.2fr] ">
+        <CalculatorLayout className="grid grid-cols-1 lg:!grid-cols-[1.5fr_0.2fr]">
             {/* Inputs Section */}
-            <div className="space-y-10  w-full">
-                <div className="flex items-center px-[30px] border-b border-zinc-200 last-stack dark:bg-zinc-900 bg-white dark:border-zinc-800 h-[65.5px] sticky top-0 justify-between">
+            <div className="space-y-6 lg:space-y-10 w-full">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-0 px-4 sm:px-[30px] border-b border-zinc-200 last-stack dark:bg-zinc-900 bg-white dark:border-zinc-800 py-4 sm:py-0 sm:h-[65.5px] sticky top-0 justify-between z-10">
                     <PlanSelector plans={plans} value={plan} onChange={setPlan} />
                     <ResetButton onReset={reset} />
                 </div>
 
-                <div className="mx-auto max-w-4xl px-[30px]">
+                <div className="mx-auto max-w-4xl px-4 sm:px-[30px] pb-6 lg:pb-0">
                     <VercelInputs />
                 </div>
             </div>
 
-            {/* Results Section */}
-            {/* <div className="space-y-6"> */}
-            <Sidebar className="right-0" width={350}>
+            {/* Results Section - Visible on mobile, below inputs */}
+            <div className="lg:hidden px-4 pb-6 space-y-6">
+                <CostDisplay
+                    cost={cost}
+                    plan={plan}
+                    providerName="Vercel"
+                    providerIcon={<SiNextdotjs className="h-6 w-6" />}
+                />
+
+                <div className="flex items-center gap-2 text-sm text-emerald-600 bg-emerald-500/10 px-3 py-2 rounded-lg">
+                    <TrendingUp className="h-4 w-4" />
+                    <span className="font-medium">Global Edge Network</span>
+                </div>
+
+                <BreakdownList breakdown={cost.breakdown} />
+            </div>
+
+            {/* Results Section - Fixed sidebar on desktop */}
+            <Sidebar className="hidden lg:block right-0" width={350}>
                 <SidebarContent>
                     <CostDisplay
                         cost={cost}
@@ -64,7 +80,6 @@ function VercelCalculator() {
                     <BreakdownList breakdown={cost.breakdown} />
                 </SidebarContent>
             </Sidebar>
-            {/* </div> */}
         </CalculatorLayout>
     )
 }

@@ -70,11 +70,11 @@ export function InputSlider({
     }
 
     return (
-        <div className={cn("space-y-3 rounded border border-border/60 bg-card p-4", className)}>
-            <div className="flex items-center justify-between gap-3">
+        <div className={cn("space-y-3 rounded border border-border/60 bg-card p-3 sm:p-4", className)}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     {icon && <span className="text-muted-foreground/80">{icon}</span>}
-                    <span>{label}</span>
+                    <span className="text-xs sm:text-sm">{label}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <input
@@ -84,7 +84,7 @@ export function InputSlider({
                         onFocus={handleInputFocus}
                         onBlur={handleInputBlur}
                         onKeyDown={handleKeyDown}
-                        className="min-w-[7rem] rounded border border-border bg-background px-3 py-1.5 text-right text-sm font-mono font-semibold text-foreground transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className="min-w-[6rem] sm:min-w-[7rem] rounded border border-border bg-background px-2 sm:px-3 py-1.5 text-right text-xs sm:text-sm font-mono font-semibold text-foreground transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                     {unit && <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">{unit}</span>}
                 </div>

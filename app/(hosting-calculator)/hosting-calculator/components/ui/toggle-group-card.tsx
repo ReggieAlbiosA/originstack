@@ -26,7 +26,7 @@ export function ToggleGroupCard({ title, value, onChange, options, columns = 3, 
 
             <div
                 className={cn(
-                    "flex gap-2",
+                    "flex flex-col sm:flex-row gap-2 flex-wrap",
                     columns === 1 && "md:grid-cols-1",
                     columns === 2 && "md:grid-cols-2",
                     columns === 3 && "md:grid-cols-3",
@@ -40,7 +40,7 @@ export function ToggleGroupCard({ title, value, onChange, options, columns = 3, 
                             type="button"
                             onClick={() => onChange(item.value)}
                             className={cn(
-                                "group flex h-full flex-col items-start gap-2 rounded border border-border/60 bg-background/80 px-3 py-2 text-left transition hover:border-primary/60 max-w-max hover:bg-primary/5",
+                                "group flex h-full flex-col items-start gap-2 rounded border border-border/60 bg-background/80 px-3 py-2 text-left transition hover:border-primary/60 w-full sm:w-auto sm:max-w-max hover:bg-primary/5",
                                 isActive && "border-primary/80 bg-primary/10 text-primary ",
                             )}
                         >
