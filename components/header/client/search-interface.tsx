@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Search, FileText, Hash, Star, X } from 'lucide-react';
 import Link from 'next/link';
 import { Route } from 'next';
-import type { SidebarConfig, SidebarLinkItem, SidebarParentItem } from '@/components/sidebar/reusable/sidebar';
+import type { SidebarConfig, NavigationItem } from '@/components/sidebar/client/sidebar';
 
 // Define interface for search result items
 interface SearchResultItem {
@@ -65,8 +65,8 @@ function saveRecentSearches(items: RecentSearchItem[]) {
 }
 
 // Helper function to check if an item is a parent item
-function isParentItem(item: SidebarLinkItem | SidebarParentItem): item is SidebarParentItem {
-    return 'children' in item && Array.isArray(item.children);
+function isParentItem(item: NavigationItem): boolean {
+    return 'children' in item && Array.isArray(item.children) && item.children.length > 0;
 }
 
 // Function to extract all routable items from sidebar config with section info
@@ -89,7 +89,7 @@ function extractRoutableItems(config: SidebarConfig): SearchResultItem[] {
                 }
 
                 // Add all children that have hrefs
-                item.children.forEach(child => {
+                item.children?.forEach(child => {
                     if (child.href) {
                         items.push({
                             label: child.label,
@@ -127,7 +127,7 @@ function getGroupedSuggestions(config: SidebarConfig): { title: string; items: S
 
         section.items.forEach(item => {
             if (isParentItem(item)) {
-                item.children.forEach(child => {
+                item.children?.forEach(child => {
                     if (child.href) {
                         sectionItems.push({
                             label: child.label,

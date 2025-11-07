@@ -12,7 +12,7 @@ import { CloudflareInputs } from "./inputs"
 import { SiCloudflare } from "react-icons/si"
 import type { CloudflarePlan } from "./types"
 import { TrendingUp } from "lucide-react"
-import { Sidebar, SidebarContent } from "@/components/sidebar/reusable/sidebar"
+import { Sidebar, SidebarContent } from "@/components/sidebar/client/sidebar"
 
 export default function CloudflarePage() {
     return (

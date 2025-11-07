@@ -11,7 +11,7 @@ import { type NavItem } from "@/components/header/client/navigation-menu"
 import { SiGithub } from "react-icons/si"
 import { MobileViewThemeToggle } from "./theme-toggle"
 import { sidebarConfig } from "@/app/(react-demo)/react-demo/demo/_shared/data/value"
-import type { SidebarLinkItem, SidebarParentItem } from "@/components/sidebar/reusable/sidebar"
+import type { SidebarLinkItem, SidebarParentItem } from "@/components/composite-ui/client/sidebar"
 
 interface MenuButtonProps {
     className?: string

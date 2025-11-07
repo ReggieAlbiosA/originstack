@@ -1,5 +1,12 @@
-import { DesktopViewTableOfContents, MobileViewTableOfContents } from "@/components/page/client/table-of-contents"
-import PageNavigation from "@/components/page/server/page-navigation"
+import {
+    TableOfContents,
+    TableOfContentsHeader,
+    TableOfContentsContent,
+    TableOfContentsNav,
+    TableOfContentsItem,
+    type TableOfContentsItem as TocItem,
+} from "@/components/page/client/table-of-contents"
+import { PageNavigation, PageNavigationNext, PageNavigationPrevious } from "@/components/page/server/page-navigation"
 import {
     demoPageTitle,
     demoPageDescription,
@@ -9,28 +16,42 @@ import {
     demoPageNavigation,
 } from "@/app/(react-demo)/react-demo/demo/_shared/data/value"
 
-// Generate table of contents based on page sections
-function getTableOfContents() {
-    return [
-        { id: "features-heading", title: "Features", level: 2 },
-        { id: "config-types-heading", title: "Configuration Types", level: 2 },
-        // Add individual config types as sub-items
-        ...demoConfigurationTypes.map((config, index) => ({
-            id: `config-${index}`,
-            title: config.title,
-            level: 3
-        })),
-        { id: "cta-heading", title: demoCallToAction.title, level: 2 },
-    ]
-}
+// ============================================================================
+// Table of Contents Data (Internal - like layout.tsx pattern)
+// ============================================================================
+
+const tableOfContentsData = [
+    { id: "features-heading", title: "Features", level: 2 },
+    { id: "config-types-heading", title: "Configuration Types", level: 2 },
+    // Add individual config types as sub-items
+    ...demoConfigurationTypes.map((config, index) => ({
+        id: `config-${index}`,
+        title: config.title,
+        level: 3
+    })),
+    { id: "cta-heading", title: demoCallToAction.title, level: 2 },
+] satisfies TocItem[]
 
 export default function DemoPage() {
-    const tocItems = getTableOfContents()
-
     return (
         <>
-            {/* ✨ Mobile TOC - Sticky collapsible menu */}
-            <MobileViewTableOfContents items={tocItems} pageTitle="On this page" />
+            {/* ✨ Mobile TOC - Sticky collapsible breadcrumb menu */}
+            <TableOfContents variant="mobile" topOffset={65}>
+                <TableOfContentsHeader title="On this page" />
+                <TableOfContentsContent>
+                    <TableOfContentsNav>
+                        {tableOfContentsData.map((item) => (
+                            <TableOfContentsItem
+                                key={item.id}
+                                href={`#${item.id}`}
+                                level={item.level}
+                            >
+                                {item.title}
+                            </TableOfContentsItem>
+                        ))}
+                    </TableOfContentsNav>
+                </TableOfContentsContent>
+            </TableOfContents>
 
             <div className="relative min-h-screen py-8">
                 {/* Main content container with responsive grid */}
@@ -94,16 +115,30 @@ export default function DemoPage() {
                         </div>
 
                         {/* Page Navigation - Previous/Next */}
-                        <PageNavigation
-                            previous={demoPageNavigation.previous}
-                            next={demoPageNavigation.next}
-                        />
+                        <PageNavigation>
+                            <PageNavigationPrevious href={demoPageNavigation.previous.href}>
+                                {demoPageNavigation.previous.title}
+                            </PageNavigationPrevious>
+                            <PageNavigationNext href={demoPageNavigation.next.href}>
+                                {demoPageNavigation.next.title}
+                            </PageNavigationNext>
+                        </PageNavigation>
                     </main>
 
                     {/* ✨ Desktop TOC - Sidebar for large screens */}
-                    <aside className="hidden xl:block">
-                        <DesktopViewTableOfContents items={tocItems} />
-                    </aside>
+                    <TableOfContents variant="desktop" topOffset={100}>
+                        <TableOfContentsNav title="Table of contents">
+                            {tableOfContentsData.map((item) => (
+                                <TableOfContentsItem
+                                    key={item.id}
+                                    href={`#${item.id}`}
+                                    level={item.level}
+                                >
+                                    {item.title}
+                                </TableOfContentsItem>
+                            ))}
+                        </TableOfContentsNav>
+                    </TableOfContents>
                 </div>
             </div>
         </>

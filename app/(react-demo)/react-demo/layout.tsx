@@ -7,7 +7,7 @@ import Header from "@/components/composite-ui/server/header";
 import { navigationItems } from "@/app/(react-demo)/react-demo/_shared/data/value";
 import { type Route } from "next";
 import Link from "next/link";
-import { sidebarConfig } from "@/app/(react-demo)/react-demo/demo/_shared/data/value";
+import { searchDocsConfig } from "@/app/(react-demo)/react-demo/demo/_shared/data/value";
 import { type NavItem } from "@/components/header/client/navigation-menu";
 
 const geistSans = Geist({
@@ -123,7 +123,7 @@ export default function RootLayout({
               href: "/react-demo",
             }}
             navigationItems={enhancedNavItems}
-            searchDocsItems={sidebarConfig}
+            searchDocsItems={searchDocsConfig}
             githubLink={{
               href: "https://github.com/originstack/originstack",
               ariaLabel: "Visit our GitHub repository",

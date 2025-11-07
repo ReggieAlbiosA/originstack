@@ -1,48 +1,107 @@
-import { DesktopViewTableOfContents, MobileViewTableOfContents } from "@/components/page/client/table-of-contents"
-import PageNavigation from "@/components/page/server/page-navigation"
 import {
-    demoPageTitle,
-    demoPageDescription,
-    demoFeatures,
-    demoConfigurationTypes,
-    demoCallToAction,
-    demoPageNavigation,
-} from "@/app/(nextjs-demo)/nextjs-demo/demo/_shared/data/value"
+    TableOfContents,
+    TableOfContentsHeader,
+    TableOfContentsContent,
+    TableOfContentsNav,
+    TableOfContentsItem,
+    type TableOfContentsItem as TocItem,
+} from "@/components/page/client/table-of-contents"
+import {
+    PageNavigation,
+    PageNavigationPrevious,
+    PageNavigationNext,
+} from "@/components/page/server/page-navigation"
 
-// Generate table of contents based on page sections
-function getTableOfContents() {
-    return [
-        { id: "features-heading", title: "Features", level: 2 },
-        { id: "config-types-heading", title: "Configuration Types", level: 2 },
-        // Add individual config types as sub-items
-        ...demoConfigurationTypes.map((config, index) => ({
-            id: `config-${index}`,
-            title: config.title,
-            level: 3
-        })),
-        { id: "cta-heading", title: demoCallToAction.title, level: 2 },
-    ]
+// ============================================================================
+// Page Data (All hardcoded inline - like layout.tsx pattern)
+// ============================================================================
+
+const pageData = {
+    title: "Reusable Sidebar Component",
+    description: "A flexible, reusable sidebar component built with Next.js and TypeScript. Features collapsible sections, nested navigation, and full customization.",
+    features: [
+        "Fully typed with TypeScript",
+        "Collapsible sections with smooth animations",
+        "Nested navigation support",
+        "Active state management",
+        "Responsive design",
+        "Dark mode support",
+        "Accessible (ARIA labels)",
+        "Easy to customize"
+    ],
+    configTypes: [
+        {
+            title: "Basic Configuration",
+            description: "Simple sidebar with static links and basic styling."
+        },
+        {
+            title: "Advanced Configuration",
+            description: "Includes collapsible sections, nested items, and custom icons."
+        },
+        {
+            title: "Custom Styling",
+            description: "Fully customizable appearance with Tailwind CSS classes."
+        }
+    ],
+    callToAction: {
+        title: "Get Started Today",
+        description: "Ready to implement this sidebar in your project? Check out the documentation and examples to get started."
+    },
+    navigation: {
+        previous: {
+            label: "Previous",
+            title: "Introduction",
+            href: "/nextjs-demo/demo/getting-started/installation"
+        },
+        next: {
+            label: "Next",
+            title: "Configuration",
+            href: "/nextjs-demo/demo/getting-started/project-structure"
+        }
+    }
 }
 
-export default function DemoPage() {
-    const tocItems = getTableOfContents()
+const tableOfContentsData = [
+    { id: "features-heading", title: "Features", level: 2 },
+    { id: "config-types-heading", title: "Configuration Types", level: 2 },
+    { id: "config-0", title: "Basic Configuration", level: 3 },
+    { id: "config-1", title: "Advanced Configuration", level: 3 },
+    { id: "config-2", title: "Custom Styling", level: 3 },
+    { id: "cta-heading", title: "Get Started Today", level: 2 },
+] satisfies TocItem[]
 
+export default function DemoPage() {
     return (
         <>
-            {/* ✨ Mobile TOC - Sticky collapsible menu */}
-            <MobileViewTableOfContents items={tocItems} pageTitle="On this page" />
+            {/* ✨ Mobile TOC - Sticky collapsible breadcrumb menu */}
+            <TableOfContents variant="mobile" topOffset={65}>
+                <TableOfContentsHeader title="On this page" />
+                <TableOfContentsContent>
+                    <TableOfContentsNav>
+                        {tableOfContentsData.map((item) => (
+                            <TableOfContentsItem
+                                key={item.id}
+                                href={`#${item.id}`}
+                                level={item.level}
+                            >
+                                {item.title}
+                            </TableOfContentsItem>
+                        ))}
+                    </TableOfContentsNav>
+                </TableOfContentsContent>
+            </TableOfContents>
 
             <div className="relative min-h-screen py-8">
                 {/* Main content container with responsive grid */}
-                <div className="xl:grid xl:grid-cols-[1fr_minmax(250px,285.996px)] ">
+                <div className="xl:grid xl:grid-cols-[1fr_minmax(100px,255.996px)] ">
                     {/* Main content */}
                     <main className="space-y-8 max-w-4xl mx-auto px-4 xl:px-0 bg-white dark:bg-zinc-900">
                         <header className="scroll-mt-20">
                             <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-                                {demoPageTitle}
+                                {pageData.title}
                             </h1>
                             <p className="text-lg text-zinc-600 dark:text-zinc-400">
-                                {demoPageDescription}
+                                {pageData.description}
                             </p>
                         </header>
 
@@ -52,7 +111,7 @@ export default function DemoPage() {
                                     Features
                                 </h2>
                                 <ul className="list-disc list-inside space-y-2 text-zinc-700 dark:text-zinc-300" role="list" aria-label="Component features">
-                                    {demoFeatures.map((feature, index) => (
+                                    {pageData.features.map((feature, index) => (
                                         <li key={index} role="listitem">{feature}</li>
                                     ))}
                                 </ul>
@@ -63,7 +122,7 @@ export default function DemoPage() {
                                     Configuration Types
                                 </h2>
                                 <div className="space-y-4" role="list" aria-label="Configuration type examples">
-                                    {demoConfigurationTypes.map((config, index) => (
+                                    {pageData.configTypes.map((config, index) => (
                                         <article
                                             key={index}
                                             id={`config-${index}`}
@@ -85,25 +144,39 @@ export default function DemoPage() {
 
                             <section id="cta-heading" className="space-y-3 scroll-mt-20" aria-labelledby="cta-heading">
                                 <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-                                    {demoCallToAction.title}
+                                    {pageData.callToAction.title}
                                 </h2>
                                 <p className="text-zinc-700 dark:text-zinc-300">
-                                    {demoCallToAction.description}
+                                    {pageData.callToAction.description}
                                 </p>
                             </section>
                         </div>
 
                         {/* Page Navigation - Previous/Next */}
-                        <PageNavigation
-                            previous={demoPageNavigation.previous}
-                            next={demoPageNavigation.next}
-                        />
+                        <PageNavigation>
+                            <PageNavigationPrevious href={pageData.navigation.previous.href}>
+                                {pageData.navigation.previous.title}
+                            </PageNavigationPrevious>
+                            <PageNavigationNext href={pageData.navigation.next.href}>
+                                {pageData.navigation.next.title}
+                            </PageNavigationNext>
+                        </PageNavigation>
                     </main>
 
                     {/* ✨ Desktop TOC - Sidebar for large screens */}
-                    <aside className="hidden xl:block">
-                        <DesktopViewTableOfContents items={tocItems} />
-                    </aside>
+                    <TableOfContents variant="desktop">
+                        <TableOfContentsNav title="On this page">
+                            {tableOfContentsData.map((item) => (
+                                <TableOfContentsItem
+                                    key={item.id}
+                                    href={`#${item.id}`}
+                                    level={item.level}
+                                >
+                                    {item.title}
+                                </TableOfContentsItem>
+                            ))}
+                        </TableOfContentsNav>
+                    </TableOfContents>
                 </div>
             </div>
         </>

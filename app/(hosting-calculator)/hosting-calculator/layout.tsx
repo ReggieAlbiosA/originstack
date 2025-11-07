@@ -3,7 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import "@/app/globals.css"
 import { ThemeProvider } from "next-themes"
 import DraggableFavButton from "@/components/globals/client/draggable-fab-button"
-import { Sidebar, SidebarHeader, SidebarContent, SidebarNavigation, SidebarNavigationSection, SidebarNavigationTrigger, SidebarNavigationGroup, SidebarNavigationItemLink } from "@/components/sidebar/reusable/sidebar"
+import { Sidebar, SidebarHeader, SidebarContent, SidebarNavigation, SidebarNavigationSection, SidebarNavigationTrigger, SidebarNavigationGroup, SidebarNavigationItemLink } from "@/components/sidebar/client/sidebar"
 import { Layers, Database, Calculator } from "lucide-react"
 import { SiNextdotjs, SiCloudflare } from "react-icons/si"
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })

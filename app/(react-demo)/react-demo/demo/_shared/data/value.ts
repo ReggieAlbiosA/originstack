@@ -1,4 +1,5 @@
-import type { SidebarConfig } from "@/components/sidebar/reusable/sidebar"
+import type { SidebarConfig } from "@/components/composite-ui/client/sidebar"
+import type { SidebarConfig as SearchSidebarConfig } from "@/components/sidebar/client/sidebar"
 
 /**
  * Demo page content values
@@ -210,6 +211,68 @@ export const sidebarConfig: SidebarConfig = {
                 {
                     label: "Higher Order Components",
                     href: "/react-demo/patterns/hoc",
+                },
+            ],
+        },
+    ],
+}
+
+/**
+ * Search docs configuration for Header component
+ * Simplified version for search interface compatibility
+ */
+export const searchDocsConfig: SearchSidebarConfig = {
+    sections: [
+        {
+            title: "GETTING STARTED",
+            collapsible: true,
+            defaultOpen: true,
+            items: [
+                {
+                    label: "Installation",
+                    href: "/react-demo/getting-started/installation",
+                },
+                {
+                    label: "Editor setup",
+                    href: "/react-demo/getting-started/editor-setup",
+                },
+            ],
+        },
+        {
+            title: "CORE CONCEPTS",
+            collapsible: true,
+            defaultOpen: true,
+            items: [
+                {
+                    label: "Styling with utility classes",
+                    href: "/react-demo/core-concepts/styling",
+                },
+                {
+                    label: "Responsive design",
+                    href: "/react-demo/core-concepts/responsive",
+                },
+                {
+                    label: "Dark mode",
+                    href: "/react-demo/core-concepts/dark-mode",
+                },
+            ],
+        },
+        {
+            title: "REACT HOOKS",
+            collapsible: true,
+            defaultOpen: true,
+            items: [
+                {
+                    label: "useState",
+                    href: "/react-demo/hooks/useState",
+                },
+                {
+                    label: "useEffect",
+                    href: "/react-demo/hooks/useEffect",
+                },
+                {
+                    label: "useContext",
+                    href: "/react-demo/hooks/useContext",
                 },
             ],
         },

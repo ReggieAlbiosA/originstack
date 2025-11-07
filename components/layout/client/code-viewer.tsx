@@ -338,7 +338,7 @@ export default function CodeViewer({ fileSystem }: CodeViewerProps) {
   };
 
   return (
-    <div className="h-[900px] dark:border-[#4f4f51] border-[1px] dark:bg-[#4f4f51] grid grid-rows-[50px_1fr] grid-cols-[300px_1fr] overflow-y-auto rounded-[15px]">
+    <div className="h-[900px] dark:border-[#4f4f51] border-[1px] dark:bg-[#4f4f51] grid grid-rows-[50px_1fr] grid-cols-[.3fr_1fr] overflow-y-auto rounded-[15px]">
       {/* Left Header */}
       <div className="px-5 bg-muted flex items-center font-semibold border-b-[1px] border-r-[1px] dark:border-[#4f4f51]">
         Files

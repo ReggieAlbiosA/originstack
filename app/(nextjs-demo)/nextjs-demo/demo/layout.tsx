@@ -9,7 +9,9 @@ import {
     SidebarNavigationTrigger,
     SidebarNavigationGroup,
     SidebarNavigationItemLink,
-} from "@/components/sidebar/reusable/sidebar"
+    type NavigationSection,
+    type NavigationItem
+} from "@/components/sidebar/client/sidebar"
 import { VersionNavigation } from "@/components/sidebar/client/version-navigation"
 
 // Navigation data structure
@@ -325,20 +327,7 @@ const navigationSections = [
 
 ] satisfies NavigationSection[]
 
-type NavigationItem = {
-    label: string
-    href?: string
-    collapsible?: boolean
-    defaultOpen?: boolean
-    children?: NavigationItem[]
-}
 
-type NavigationSection = {
-    title: string
-    collapsible: boolean
-    defaultOpen: boolean
-    items: NavigationItem[]
-}
 
 export default function DemoLayout({
     children,

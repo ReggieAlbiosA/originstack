@@ -1,20 +1,54 @@
 /**
- * Table of Contents Components
+ * Table of Contents - Composable Architecture
  *
- * Contains both mobile and desktop variants of the table of contents:
- * - MobileViewTableOfContents: Collapsible sticky TOC for mobile/tablet
- * - DesktopViewTableOfContents: Sidebar TOC for desktop
+ * A flexible, composable table of contents system.
+ * Follows the same compositional pattern as the new sidebar component.
+ *
+ * @example
+ * ```tsx
+ * // Define data inline (like navigationSections in layout.tsx)
+ * const tableOfContentsData = [
+ *   { id: "intro", title: "Introduction", level: 2 },
+ *   { id: "features", title: "Features", level: 3 }
+ * ] satisfies TableOfContentsItem[]
+ *
+ * // Mobile variant
+ * <TableOfContents variant="mobile" sticky topOffset={65}>
+ *   <TableOfContentsHeader title="On this page" />
+ *   <TableOfContentsContent>
+ *     <TableOfContentsNav>
+ *       {tableOfContentsData.map(item => (
+ *         <TableOfContentsItem key={item.id} href={`#${item.id}`} level={item.level}>
+ *           {item.title}
+ *         </TableOfContentsItem>
+ *       ))}
+ *     </TableOfContentsNav>
+ *   </TableOfContentsContent>
+ * </TableOfContents>
+ *
+ * // Desktop variant
+ * <TableOfContents variant="desktop" sticky topOffset={100}>
+ *   <TableOfContentsNav title="Table of contents">
+ *     {tableOfContentsData.map(item => (
+ *       <TableOfContentsItem key={item.id} href={`#${item.id}`} level={item.level}>
+ *         {item.title}
+ *       </TableOfContentsItem>
+ *     ))}
+ *   </TableOfContentsNav>
+ * </TableOfContents>
+ * ```
  */
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 import { ChevronRight } from 'lucide-react'
 import { IconListSearch } from '@tabler/icons-react'
-import clsx from 'clsx'
-import { cn } from '@/lib/utils'
 
-// ==================== Shared Types ====================
+// ============================================================================
+// Types
+// ============================================================================
 
 export interface TableOfContentsItem {
     id: string
@@ -22,140 +56,197 @@ export interface TableOfContentsItem {
     level: number
 }
 
-interface TableOfContentsProps {
-    items: TableOfContentsItem[]
+type Variant = 'mobile' | 'desktop'
+
+// ============================================================================
+// Context (Active Section Tracking)
+// ============================================================================
+
+interface TableOfContentsContextProps {
+    activeId: string
+    setActiveId: (id: string) => void
+    variant: Variant
 }
 
-interface MobileTableOfContentsProps extends TableOfContentsProps {
-    pageTitle?: string
+const TableOfContentsContext = React.createContext<TableOfContentsContextProps | null>(null)
+
+function useTableOfContents() {
+    const context = React.useContext(TableOfContentsContext)
+    if (!context) {
+        throw new Error('TableOfContents components must be used within <TableOfContents>')
+    }
+    return context
 }
 
-// ==================== Shared Utilities ====================
+// ============================================================================
+// Context (Mobile Collapsible)
+// ============================================================================
 
-/**
- * Convert TOC items to link format
- */
-function convertToLinks(items: TableOfContentsItem[]) {
-    return items.map(item => ({
-        label: item.title,
-        link: `#${item.id}`,
-        level: item.level
-    }))
+interface TableOfContentsMobileContextProps {
+    isOpen: boolean
+    setIsOpen: (open: boolean) => void
 }
 
-/**
- * Custom hook for tracking active section on scroll
- */
-function useActiveSection(links: ReturnType<typeof convertToLinks>) {
-    const [active, setActive] = useState('')
+const TableOfContentsMobileContext = React.createContext<TableOfContentsMobileContextProps | null>(null)
 
-    useEffect(() => {
+function useTableOfContentsMobile() {
+    const context = React.useContext(TableOfContentsMobileContext)
+    return context // Can be null for desktop variant
+}
+
+// ============================================================================
+// TableOfContents (Root Container)
+// ============================================================================
+
+interface TableOfContentsProps extends React.HTMLAttributes<HTMLElement> {
+    variant?: Variant
+    topOffset?: number  // Only used for mobile variant
+}
+
+export function TableOfContents({
+    variant = 'desktop',
+    topOffset = 65,
+    children,
+    className,
+    ...props
+}: TableOfContentsProps) {
+    const [activeId, setActiveId] = React.useState('')
+    const [isOpen, setIsOpen] = React.useState(false)
+
+    // Scroll tracking for active section
+    React.useEffect(() => {
         const handleScroll = () => {
-            const sections = links.map(link => link.link.substring(1))
+            const headings = document.querySelectorAll('h2, h3, h4, h5, h6')
             const scrollPosition = window.scrollY + 100
 
-            for (let i = sections.length - 1; i >= 0; i--) {
-                const element = document.getElementById(sections[i])
-                if (element && element.offsetTop <= scrollPosition) {
-                    setActive(`#${sections[i]}`)
+            for (let i = headings.length - 1; i >= 0; i--) {
+                const heading = headings[i] as HTMLElement
+                if (heading.offsetTop <= scrollPosition && heading.id) {
+                    setActiveId(heading.id)
                     break
                 }
             }
         }
 
         window.addEventListener('scroll', handleScroll)
-        handleScroll()
+        handleScroll() // Initial check
 
         return () => window.removeEventListener('scroll', handleScroll)
-    }, [links])
+    }, [])
 
-    return [active, setActive] as const
-}
-
-/**
- * Smooth scroll to section with header offset
- */
-function scrollToSection(targetId: string, link: string, headerOffset = 80) {
-    const targetElement = document.getElementById(targetId)
-    if (targetElement) {
-        const elementPosition = targetElement.getBoundingClientRect().top
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-
-        window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-        })
-        window.history.pushState(null, '', link)
-    }
-}
-
-// ==================== Mobile View Component ====================
-
-/**
- * Mobile View Table of Contents
- *
- * A mobile-friendly, collapsible TOC that sticks to the top of the page.
- * Features breadcrumb-style active section display and smooth scrolling.
- *
- * @example
- * ```tsx
- * <MobileViewTableOfContents
- *   items={tocItems}
- *   pageTitle="On this page"
- * />
- * ```
- */
-export function MobileViewTableOfContents({
-    items,
-    pageTitle = "On this page"
-}: MobileTableOfContentsProps) {
-    const [isOpen, setIsOpen] = useState(false)
-    const links = convertToLinks(items)
-    const [active, setActive] = useActiveSection(links)
-
-    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, link: string) => {
-        e.preventDefault()
-        const targetId = link.substring(1)
-        scrollToSection(targetId, link, 80)
-        setActive(link)
-        setIsOpen(false) // Close menu after selection
+    const tocContextValue = {
+        activeId,
+        setActiveId,
+        variant
     }
 
-    // Close menu when clicking outside
-    useEffect(() => {
+    const mobileContextValue = {
+        isOpen,
+        setIsOpen
+    }
+
+    if (variant === 'mobile') {
+        return (
+            <TableOfContentsContext.Provider value={tocContextValue}>
+                <TableOfContentsMobileContext.Provider value={mobileContextValue}>
+                    <div
+                        {...props}
+                        data-toc-mobile
+                        style={{ top: `${topOffset}px` }}
+                        className={cn(
+                            'xl:hidden sticky z-40 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md',
+                            'border-b border-zinc-200 dark:border-zinc-800',
+                            className
+                        )}
+                    >
+                        {children}
+                    </div>
+                </TableOfContentsMobileContext.Provider>
+            </TableOfContentsContext.Provider>
+        )
+    }
+
+    // Desktop variant (sticky is applied on TableOfContentsNav, not here)
+    return (
+        <TableOfContentsContext.Provider value={tocContextValue}>
+            <aside
+                {...props}
+                className={cn(
+                    'hidden xl:block w-full',
+                    className
+                )}
+                role="complementary"
+                aria-label="On this page"
+            >
+                {children}
+            </aside>
+        </TableOfContentsContext.Provider>
+    )
+}
+
+// ============================================================================
+// TableOfContentsHeader (Mobile trigger/breadcrumb)
+// ============================================================================
+
+interface TableOfContentsHeaderProps extends React.HTMLAttributes<HTMLElement> {
+    title?: string
+    icon?: React.ReactNode
+}
+
+export function TableOfContentsHeader({
+    title = "On this page",
+    icon,
+    className,
+    ...props
+}: TableOfContentsHeaderProps) {
+    const { activeId } = useTableOfContents()
+    const mobileContext = useTableOfContentsMobile()
+
+    if (!mobileContext) {
+        // Desktop variant doesn't use header
+        return null
+    }
+
+    const { isOpen, setIsOpen } = mobileContext
+
+    // Find active item title from DOM
+    const activeTitle = (() => {
+        if (!activeId) return null
+        const element = document.getElementById(activeId)
+        return element?.textContent || null
+    })()
+
+    // Close on outside click
+    React.useEffect(() => {
         if (!isOpen) return
 
         const handleClickOutside = (e: MouseEvent) => {
             const target = e.target as HTMLElement
-            if (!target.closest('[data-mobile-toc]')) {
+            if (!target.closest('[data-toc-mobile]')) {
                 setIsOpen(false)
             }
         }
 
         document.addEventListener('click', handleClickOutside)
         return () => document.removeEventListener('click', handleClickOutside)
-    }, [isOpen])
-
-    if (items.length === 0) return null
-
-    // Get the active section title for breadcrumb display
-    const activeItem = links.find(link => link.link === active)
-    const activeTitle = activeItem?.label
+    }, [isOpen, setIsOpen])
 
     return (
-        <div
-            className="xl:hidden sticky lg:top-[64.5px] md:top-[65px] top-[64.9px] z-40 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800"
-            data-mobile-toc
+        <button
+            {...props}
+            onClick={() => setIsOpen(!isOpen)}
+            className={cn(
+                'w-full flex items-center justify-between px-3 py-3',
+                'text-left hover:bg-zinc-50 dark:hover:bg-zinc-800/50',
+                'transition-colors',
+                className
+            )}
+            aria-expanded={isOpen}
+            aria-controls="toc-mobile-content"
         >
-            {/* Toggle Button */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between px-3 py-3 text-left hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                aria-expanded={isOpen}
-                aria-controls="mobile-toc-menu"
-            >
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                    {/* Hamburger Icon */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+                {/* Hamburger Icon */}
+                {icon || (
                     <svg
                         className="w-5 h-5 text-zinc-600 dark:text-zinc-400 shrink-0"
                         fill="none"
@@ -170,133 +261,219 @@ export function MobileViewTableOfContents({
                             d="M4 6h16M4 12h16M4 18h16"
                         />
                     </svg>
+                )}
 
-                    {/* Breadcrumb-style title */}
-                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 shrink-0">
-                            {pageTitle}
-                        </span>
-                        {activeTitle && (
-                            <>
-                                <ChevronRight
-                                    className={cn(
-                                        "text-zinc-600 dark:text-zinc-400 transition-transform duration-200 shrink-0",
-                                        isOpen && "rotate-90"
-                                    )}
-                                    size={15}
-                                    aria-hidden="true"
-                                />
-                                <span className="text-sm font-medium text-zinc-900/40 dark:text-zinc-100/40 truncate">
-                                    {activeTitle}
-                                </span>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </button>
-
-            {/* Dropdown Menu */}
-            {isOpen && (
-                <nav
-                    id="mobile-toc-menu"
-                    className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 absolute top-full left-0 w-full max-h-[70vh] overflow-y-auto"
-                    aria-label="Table of contents"
-                >
-                    {links.map((item) => {
-                        const isActive = active === item.link
-                        // Calculate indentation based on heading level (h2 = 0, h3 = 1, h4 = 2, etc.)
-                        const indent = Math.max(0, item.level - 2)
-
-                        return (
-                            <a
-                                key={item.label}
-                                href={item.link}
-                                onClick={(e) => handleClick(e, item.link)}
-                                className={clsx(
-                                    'block no-underline text-sm py-2.5 px-4 transition-colors border-l-2',
-                                    isActive
-                                        ? 'font-medium border-l-blue-600 text-blue-600 bg-blue-50 dark:border-l-blue-400 dark:text-blue-400 dark:bg-blue-950/50'
-                                        : 'border-l-transparent text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                {/* Breadcrumb */}
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                    <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 shrink-0">
+                        {title}
+                    </span>
+                    {activeTitle && (
+                        <>
+                            <ChevronRight
+                                className={cn(
+                                    "text-zinc-600 dark:text-zinc-400 transition-transform duration-200 shrink-0",
+                                    isOpen && "rotate-90"
                                 )}
-                                style={{ paddingLeft: `${16 + indent * 16}px` }}
-                            >
-                                {item.label}
-                            </a>
-                        )
-                    })}
-                </nav>
-            )}
+                                size={15}
+                                aria-hidden="true"
+                            />
+                            <span className="text-sm font-medium text-zinc-900/40 dark:text-zinc-100/40 truncate">
+                                {activeTitle}
+                            </span>
+                        </>
+                    )}
+                </div>
+            </div>
+        </button>
+    )
+}
+
+// ============================================================================
+// TableOfContentsContent (Scrollable container)
+// ============================================================================
+
+interface TableOfContentsContentProps extends React.HTMLAttributes<HTMLElement> {
+    maxHeight?: string
+}
+
+export function TableOfContentsContent({
+    maxHeight = '70vh',
+    className,
+    children,
+    ...props
+}: TableOfContentsContentProps) {
+    const { variant } = useTableOfContents()
+    const mobileContext = useTableOfContentsMobile()
+
+    if (variant === 'mobile') {
+        if (!mobileContext?.isOpen) return null
+
+        return (
+            <nav
+                {...props}
+                id="toc-mobile-content"
+                style={{ maxHeight }}
+                className={cn(
+                    'border-t border-zinc-200 dark:border-zinc-800',
+                    'bg-white dark:bg-zinc-900',
+                    'absolute top-full left-0 w-full overflow-y-auto',
+                    className
+                )}
+                aria-label="On this page"
+            >
+                {children}
+            </nav>
+        )
+    }
+
+    // Desktop variant
+    return (
+        <div {...props} className={cn('w-full', className)}>
+            {children}
         </div>
     )
 }
 
-// ==================== Desktop View Component ====================
+// ============================================================================
+// TableOfContentsNav (Navigation wrapper)
+// ============================================================================
 
-/**
- * Desktop View Table of Contents
- *
- * A sidebar TOC for desktop screens with active section tracking
- * and smooth scrolling navigation.
- *
- * @example
- * ```tsx
- * <DesktopViewTableOfContents items={tocItems} />
- * ```
- */
-export function DesktopViewTableOfContents({ items }: TableOfContentsProps) {
-    const links = convertToLinks(items)
-    const [active, setActive] = useActiveSection(links)
+interface TableOfContentsNavProps extends React.HTMLAttributes<HTMLElement> {
+    title?: string
+    icon?: React.ReactNode
+    showTitle?: boolean
+}
 
-    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, link: string) => {
-        e.preventDefault()
-        const targetId = link.substring(1)
-        const targetElement = document.getElementById(targetId)
+export function TableOfContentsNav({
+    title = "On this page",
+    icon,
+    showTitle = true,
+    className,
+    children,
+    ...props
+}: TableOfContentsNavProps) {
+    const { variant } = useTableOfContents()
 
-        if (targetElement) {
-            targetElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            })
-            window.history.pushState(null, '', link)
-        }
-        setActive(link)
+    if (variant === 'mobile') {
+        return (
+            <ul
+                {...props}
+                className={cn('list-none space-y-0', className)}
+                role="list"
+            >
+                {children}
+            </ul>
+        )
     }
 
-    const tocItems = links.map((item) => (
-        <a
-            key={item.label}
-            href={item.link}
-            onClick={(e) => handleClick(e, item.link)}
-            className={clsx(
-                'block no-underline text-sm leading-[1.2] py-2 px-3 rounded-r-md border-l transition-colors',
-                'hover:bg-gray-100 dark:hover:bg-gray-800',
-                active === item.link
-                    ? 'font-medium border-l-blue-600 text-blue-600 bg-blue-50 dark:border-l-blue-400 dark:text-blue-400 dark:bg-blue-950'
-                    : 'border-l-gray-300 dark:border-l-gray-600 text-gray-800 dark:text-gray-300'
-            )}
-            style={{ paddingLeft: `calc(${item.level} * 0.75rem)` }}
-        >
-            {item.label}
-        </a>
-    ))
-
+    // Desktop variant with optional title
     return (
-        <nav className="w-full sticky top-25 pt-8" aria-label="Table of contents">
-            <div className="flex items-center gap-2 mb-3">
-                <IconListSearch size={18} stroke={1.5} className="text-gray-700 dark:text-gray-300" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Table of contents
-                </span>
-            </div>
-            <div className="space-y-1">{tocItems}</div>
+        <nav {...props} className={cn('w-full sticky top-25 pt-8', className)} aria-label="On this page">
+            {showTitle && (
+                <div className="flex items-center gap-2 mb-3">
+                    {icon || <IconListSearch size={18} stroke={1.5} className="text-zinc-700 dark:text-zinc-300" />}
+                    <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        {title}
+                    </span>
+                </div>
+            )}
+            <ul className="ml-2 list-none" role="list">
+                {children}
+            </ul>
         </nav>
     )
 }
 
-// ==================== Legacy Export (Deprecated) ====================
+// ============================================================================
+// TableOfContentsItem (Individual link)
+// ============================================================================
 
-/**
- * @deprecated Use DesktopViewTableOfContents instead
- * This export is maintained for backwards compatibility only
- */
-export const TableOfContents = DesktopViewTableOfContents
+interface TableOfContentsItemProps extends React.HTMLAttributes<HTMLLIElement> {
+    href: string
+    level?: number
+    children: React.ReactNode
+}
+
+export function TableOfContentsItem({
+    href,
+    level = 2,
+    children,
+    className,
+    ...props
+}: TableOfContentsItemProps) {
+    const { activeId, setActiveId, variant } = useTableOfContents()
+    const mobileContext = useTableOfContentsMobile()
+
+    const id = href.startsWith('#') ? href.substring(1) : href
+    const isActive = activeId === id
+
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault()
+
+        const targetElement = document.getElementById(id)
+        if (targetElement) {
+            const headerOffset = 80
+            const elementPosition = targetElement.getBoundingClientRect().top
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            })
+
+            window.history.pushState(null, '', href)
+            setActiveId(id)
+
+            // Close mobile menu
+            if (mobileContext) {
+                mobileContext.setIsOpen(false)
+            }
+        }
+    }
+
+    // Calculate indentation based on level (h2 = 0, h3 = 1, h4 = 2, etc.)
+    const indent = Math.max(0, level - 2)
+
+    if (variant === 'mobile') {
+        return (
+            <li {...props} className={cn('list-none', className)} role="listitem">
+                <a
+                    href={href}
+                    onClick={handleClick}
+                    className={cn(
+                        'block no-underline text-sm py-2.5 px-4 transition-colors border-l-2',
+                        isActive
+                            ? 'font-medium border-l-blue-600 text-blue-600 bg-blue-50 dark:border-l-blue-400 dark:text-blue-400 dark:bg-blue-950/50'
+                            : 'border-l-transparent text-zinc-700 dark:text-zinc-300 hover:border-l-zinc-600 dark:hover:border-l-zinc-400'
+                    )}
+                    style={{ paddingLeft: `${16 + indent * 16}px` }}
+                >
+                    {children}
+                </a>
+            </li>
+        )
+    }
+
+    // Desktop variant
+    return (
+        <li {...props} className={cn('list-none', className)} role="listitem">
+            <a
+                href={href}
+                onClick={handleClick}
+                className={cn(
+                    'block no-underline text-sm leading-[1.2] py-2 px-3 rounded-r-md border-l transition-colors',
+                    'hover:text-zinc-900 dark:hover:text-zinc-100',
+                    'hover:border-l-zinc-600 dark:hover:border-l-zinc-400',
+                    isActive
+                        ? 'font-medium border-l-blue-600 text-blue-600 bg-blue-50 dark:border-l-blue-400 dark:text-blue-400 dark:bg-blue-950'
+                        : 'border-l-zinc-300 dark:border-l-zinc-600 text-zinc-800 dark:text-zinc-300'
+                )}
+                style={{ paddingLeft: `calc(0.75rem + ${indent * 0.75}rem)` }}
+            >
+                {children}
+            </a>
+        </li>
+    )
+}
+

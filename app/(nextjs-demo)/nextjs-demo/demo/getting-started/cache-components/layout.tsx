@@ -1,6 +1,17 @@
 import { Article } from "@/components/layout/server/article";
-import { DesktopViewTableOfContents, MobileViewTableOfContents } from "@/components/page/client/table-of-contents";
-import PageNavigation from "@/components/page/server/page-navigation";
+import {
+    TableOfContents,
+    TableOfContentsHeader,
+    TableOfContentsContent,
+    TableOfContentsNav,
+    TableOfContentsItem,
+    type TableOfContentsItem as TocItem,
+} from "@/components/page/client/table-of-contents";
+import {
+    PageNavigation,
+    PageNavigationPrevious,
+    PageNavigationNext,
+} from "@/components/page/server/page-navigation";
 
 export const metadata = {
     title: "Getting Started - Partial Prerendering in Next.js",
@@ -8,24 +19,42 @@ export const metadata = {
         "Learn how to use Partial Prerendering (PPR) to combine a static shell with dynamic content for faster page loads.",
 };
 
+// ============================================================================
+// Table of Contents Data (Hardcoded inline)
+// ============================================================================
+
+const tableOfContentsData = [
+    { id: "introduction", title: "Introduction", level: 2 },
+    { id: "ppr-overview", title: "What is Partial Prerendering?", level: 2 },
+    { id: "usage", title: "How to Use PPR", level: 3 },
+    { id: "examples", title: "Examples", level: 3 },
+    { id: "resources", title: "Further Resources", level: 3 }
+] satisfies TocItem[]
+
 export default function PartialPrerenderingLayout({
-    ppr,
+    children,
 }: {
-    ppr: React.ReactNode;
+    children: React.ReactNode;
 }) {
     return (
         <>
-
-            <MobileViewTableOfContents
-                items={[
-                    { id: "introduction", title: "Introduction", level: 2 },
-                    { id: "ppr-overview", title: "What is Partial Prerendering?", level: 2 },
-                    { id: "usage", title: "How to Use PPR", level: 3 },
-                    { id: "examples", title: "Examples", level: 3 },
-                    { id: "resources", title: "Further Resources", level: 3 }
-                ]}
-                pageTitle="On this page"
-            />
+            {/* ✨ Mobile TOC - Sticky collapsible breadcrumb menu */}
+            <TableOfContents variant="mobile" topOffset={65}>
+                <TableOfContentsHeader title="On this page" />
+                <TableOfContentsContent>
+                    <TableOfContentsNav>
+                        {tableOfContentsData.map((item) => (
+                            <TableOfContentsItem
+                                key={item.id}
+                                href={`#${item.id}`}
+                                level={item.level}
+                            >
+                                {item.title}
+                            </TableOfContentsItem>
+                        ))}
+                    </TableOfContentsNav>
+                </TableOfContentsContent>
+            </TableOfContents>
 
             <div className="relative min-h-screen py-8">
                 {/* Main content container with responsive grid */}
@@ -44,21 +73,34 @@ export default function PartialPrerenderingLayout({
                         >
 
                             <div className="space-y-8">
-                                {ppr}
+                                {children}
                             </div>
                         </Article>
 
-                        <PageNavigation previous={{ label: "Previous", title: "Introduction", href: "/docs/introduction" }} next={{ label: "Next", title: "Getting Started", href: "/docs/getting-started" }} className="max-w-[1150px] mx-auto" />
+                        <PageNavigation className="max-w-[1150px] mx-auto">
+                            <PageNavigationPrevious href="/docs/introduction">
+                                Introduction
+                            </PageNavigationPrevious>
+                            <PageNavigationNext href="/docs/getting-started">
+                                Getting Started
+                            </PageNavigationNext>
+                        </PageNavigation>
                     </main>
-                    <aside className="hidden xl:block">
-                        <DesktopViewTableOfContents items={[
-                            { id: "introduction", title: "Introduction", level: 2 },
-                            { id: "ppr-overview", title: "What is Partial Prerendering?", level: 2 },
-                            { id: "usage", title: "How to Use PPR", level: 3 },
-                            { id: "examples", title: "Examples", level: 3 },
-                            { id: "resources", title: "Further Resources", level: 3 }
-                        ]} />
-                    </aside>
+
+                    {/* ✨ Desktop TOC - Sidebar for large screens */}
+                    <TableOfContents variant="desktop">
+                        <TableOfContentsNav title="On this page">
+                            {tableOfContentsData.map((item) => (
+                                <TableOfContentsItem
+                                    key={item.id}
+                                    href={`#${item.id}`}
+                                    level={item.level}
+                                >
+                                    {item.title}
+                                </TableOfContentsItem>
+                            ))}
+                        </TableOfContentsNav>
+                    </TableOfContents>
                 </div>
             </div>
         </>
