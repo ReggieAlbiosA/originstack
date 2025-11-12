@@ -37,7 +37,7 @@ async function getGitHubUser(): Promise<{ data: GitHubUser; error?: string; isFa
     try {
         const res = await fetch('https://api.github.com/users/vercel', {
             cache: 'no-store', // Always fetch fresh, never cache
-            signal: AbortSignal.timeout(5000), // 5 second timeout
+            signal: AbortSignal.timeout(10000), // 10 second timeout for WSL2 compatibility
         });
 
         if (!res.ok) {

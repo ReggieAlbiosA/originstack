@@ -9,57 +9,53 @@ import { DemoError } from './demo-error';
  * Perfect for static content that rarely changes
  */
 
-interface Quote {
-    _id: string;
-    content: string;
-    author: string;
-    tags: string[];
-    authorSlug: string;
-    length: number;
+interface Advice {
+    id: string;
+    advice: string;
 }
 
-// Fallback quotes in case API is unavailable
-const FALLBACK_QUOTES: Quote[] = [
+interface AdviceResponse {
+    slip: Advice;
+}
+
+// Fallback advice in case API is unavailable
+const FALLBACK_ADVICE: Advice[] = [
     {
-        _id: '1',
-        content: 'The best way to predict the future is to invent it.',
-        author: 'Alan Kay',
-        tags: ['technology', 'future'],
-        authorSlug: 'alan-kay',
-        length: 51,
+        id: '1',
+        advice: 'The best way to predict the future is to invent it.',
     },
     {
-        _id: '2',
-        content: 'Performance is not just about what you measure, but what you choose to optimize.',
-        author: 'Unknown',
-        tags: ['performance', 'optimization'],
-        authorSlug: 'unknown',
-        length: 82,
+        id: '2',
+        advice: 'Performance is not just about what you measure, but what you choose to optimize.',
+    },
+    {
+        id: '3',
+        advice: 'Always write code as if the person who ends up maintaining it is a violent psychopath who knows where you live.',
     },
 ];
 
-async function getRandomQuote(): Promise<{ data: Quote; error?: string; isFallback: boolean }> {
+async function getRandomAdvice(): Promise<{ data: Advice; error?: string; isFallback: boolean }> {
     try {
-        const res = await fetch('https://api.quotable.io/quotes/random', {
+        const res = await fetch('https://api.adviceslip.com/advice', {
             cache: 'force-cache', // Cache indefinitely
             next: {
-                tags: ['quotes'], // Tag for manual invalidation if needed
+                tags: ['advice'], // Tag for manual invalidation if needed
             },
-            signal: AbortSignal.timeout(5000),
+            signal: AbortSignal.timeout(10000), // 10 second timeout for WSL2 compatibility
         });
 
         if (!res.ok) {
             throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
 
-        const data = (await res.json()) as Quote[];
-        return { data: data[0], isFallback: false };
+        const data = (await res.json()) as AdviceResponse;
+        return { data: data.slip, isFallback: false };
     } catch (error) {
-        console.warn('Quotes API unavailable, using fallback data:', error);
-        // Random fallback quote
-        const randomQuote = FALLBACK_QUOTES[Math.floor(Math.random() * FALLBACK_QUOTES.length)];
+        console.warn('Advice API unavailable, using fallback data:', error);
+        // Random fallback advice
+        const randomAdvice = FALLBACK_ADVICE[Math.floor(Math.random() * FALLBACK_ADVICE.length)];
         return {
-            data: randomQuote,
+            data: randomAdvice,
             error: error instanceof Error ? error.message : 'Unknown error',
             isFallback: true,
         };
@@ -70,7 +66,7 @@ export default async function ForceCacheDemo() {
     // Access connection to ensure dynamic rendering
     await connection();
 
-    const { data: quote, error, isFallback } = await getRandomQuote();
+    const { data: advice, error, isFallback } = await getRandomAdvice();
     const fetchTime = new Date().toLocaleTimeString();
 
     // If using fallback data, show error state
@@ -107,19 +103,12 @@ export default async function ForceCacheDemo() {
                 <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border rounded-lg p-6">
                     <blockquote className="space-y-4">
                         <p className="text-lg italic leading-relaxed">
-                            "{quote.content}"
+                            "{advice.advice}"
                         </p>
                         <footer className="flex items-center justify-between">
                             <cite className="text-sm font-semibold not-italic">
-                                — {quote.author}
+                                Advice #{advice.id}
                             </cite>
-                            <div className="flex gap-2">
-                                {quote.tags.slice(0, 2).map((tag) => (
-                                    <Badge key={tag} variant="secondary" className="text-xs">
-                                        {tag}
-                                    </Badge>
-                                ))}
-                            </div>
                         </footer>
                     </blockquote>
                 </div>
@@ -135,7 +124,7 @@ export default async function ForceCacheDemo() {
                     </div>
                     <div className="flex justify-between">
                         <span>Cache tag:</span>
-                        <span className="font-mono">'quotes'</span>
+                        <span className="font-mono">'advice'</span>
                     </div>
                     <div className="flex justify-between">
                         <span>Revalidation:</span>
@@ -145,9 +134,9 @@ export default async function ForceCacheDemo() {
 
                 <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-md p-3">
                     <p className="text-xs text-amber-800 dark:text-amber-200">
-                        <strong>How it works:</strong> This quote was fetched once and cached indefinitely.
-                        Even if you refresh the page, the same quote will appear unless you rebuild the application
-                        or manually invalidate the cache using <code className="bg-amber-100 dark:bg-amber-900 px-1 rounded">revalidateTag('quotes')</code>.
+                        <strong>How it works:</strong> This advice was fetched once and cached indefinitely.
+                        Even if you refresh the page, the same advice will appear unless you rebuild the application
+                        or manually invalidate the cache using <code className="bg-amber-100 dark:bg-amber-900 px-1 rounded">revalidateTag('advice')</code>.
                     </p>
                 </div>
             </CardContent>

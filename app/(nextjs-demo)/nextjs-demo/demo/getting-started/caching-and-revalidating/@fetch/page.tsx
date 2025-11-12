@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
-import NoCacheDemo from './components/no-cache-demo';
-import ForceCacheDemo from './components/force-cache-demo';
-import TimeBasedDemo from './components/time-based-demo';
-import TagBasedDemo from './components/tag-based-demo';
+import NoCacheDemo from './server/no-cache-demo';
+import ForceCacheDemo from './server/force-cache-demo';
+import TimeBasedDemo from './server/time-based-demo';
+import TagBasedDemo from './server/tag-based-demo';
 import { Card, CardContent } from '@/components/shadcn-ui/card';
 
 function LoadingSkeleton() {

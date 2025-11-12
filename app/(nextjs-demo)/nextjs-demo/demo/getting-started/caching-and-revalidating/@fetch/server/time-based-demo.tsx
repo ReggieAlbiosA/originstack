@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn-ui/card';
 import { Badge } from '@/components/shadcn-ui/badge';
-import { RevalidateButton } from './revalidate-button';
+import { RevalidateButton } from '../client/revalidate-button';
 import { revalidateWeatherTag } from '../actions';
 import { connection } from 'next/server';
 import { DemoError } from './demo-error';
@@ -46,7 +46,7 @@ async function getWeatherData(): Promise<{ data: WeatherData; error?: string; is
                     revalidate: 30, // Revalidate every 30 seconds
                     tags: ['weather'],
                 },
-                signal: AbortSignal.timeout(5000),
+                signal: AbortSignal.timeout(10000), // 10 second timeout for WSL2 compatibility
             }
         );
 

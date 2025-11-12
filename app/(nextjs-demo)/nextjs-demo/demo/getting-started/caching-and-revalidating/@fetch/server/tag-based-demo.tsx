@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn-ui/card';
 import { Badge } from '@/components/shadcn-ui/badge';
-import { RevalidateButton } from './revalidate-button';
+import { RevalidateButton } from '../client/revalidate-button';
 import { revalidatePostsTag } from '../actions';
 import { connection } from 'next/server';
 import { DemoError } from './demo-error';
@@ -58,7 +58,7 @@ async function getPosts(): Promise<{ data: Post[]; error?: string; isFallback: b
             next: {
                 tags: ['posts'], // Tag for on-demand revalidation
             },
-            signal: AbortSignal.timeout(5000),
+            signal: AbortSignal.timeout(10000), // 10 second timeout for WSL2 compatibility
         });
 
         if (!res.ok) {

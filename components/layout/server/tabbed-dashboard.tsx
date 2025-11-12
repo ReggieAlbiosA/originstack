@@ -63,8 +63,10 @@ export default function TabbedDashboard({ children, archirecture, fileSystem }: 
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <TabsContent value="tab-1">
-        <div className="bg-muted !h-[clamp(200px,90vh,900px)] overflow-y-auto rounded-2xl">
-          {children}
+        <div className="overflow-hidden  rounded-2xl">
+          <div className="bg-muted !h-[clamp(200px,90vh,900px)] overflow-y-auto">
+            {children}
+          </div>
         </div>
       </TabsContent>
       <TabsContent value="tab-2">

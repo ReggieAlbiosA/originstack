@@ -190,6 +190,7 @@ html {
   border: 3px solid #ffffff;
   /* Creates padding effect */
   transition: background-color 0.2s ease;
+  margin-left: -100px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
