@@ -1,0 +1,129 @@
+// ===============================
+// schema.prisma
+// Prisma Fundamentals — Model-Level Attributes
+// Example: Library Book Inventory System
+// ===============================
+
+// Model: ModelLevelAttributes
+// Purpose: Represents a unique book copy within a library branch
+// Key Concepts Demonstrated: Composite keys, unique constraints, indexing, relations
+model ModelLevelAttributes {
+  // 📌 Primary fields
+
+  // Unique book identifier
+  // - Use case: Record lookup, foreign key in BorrowingHistory
+  // - Example: 101, 502, 1001
+  bookId     Int    @map("book_id")
+
+  // Branch identifier
+  // - Use case: Multi-branch management, unique stock per branch
+  // - Example: 1 (Downtown), 2 (Uptown)
+  branchId   Int    @map("branch_id")
+
+  // ISBN (International Standard Book Number)
+  // - Use case: ISBN-based search, duplicate prevention
+  // - Example: "978-3-16-148410-0", "978-0-262-13472-9"
+  isbn       String @map("isbn_code")
+
+  // Book title
+  // - Use case: Sorting, searching, SEO in catalog systems
+  // - Example: "Clean Code", "The Pragmatic Programmer"
+  title      String @map("book_title")
+
+  // Book description (optional)
+  // - Use case: Keyword-based search, book previews
+  // - Example: "A guide to writing clean, maintainable code."
+  summary    String? @map("book_summary")
+
+  // Timestamp of when the book record was created
+  // - Use case: Recently added filter, inventory tracking
+  // - Example: "2025-08-16T10:30:00Z"
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  // 📌 Relations
+
+  // Book belongs to one branch
+  branch     Branch   @relation(fields: [branchId], references: [id])
+
+  // One-to-many: A book can have multiple borrowing history records
+  borrowing  BorrowingHistory[]
+
+  // 📌 Constraints & Indexes
+
+  // Composite primary key
+  // - Defines uniqueness of (bookId + branchId)
+  // - Example Allowed: (101,1,"Clean Code"), (101,2,"Clean Code")
+  // - Example Not Allowed: duplicate (101,1,"Clean Code")
+  // - Query Example:
+  //   prisma.modelLevelAttributes.findUnique({
+  //     where: { bookId_branchId: { bookId: 101, branchId: 1 } }
+  //   })
+  @@id([bookId, branchId])
+
+  // Composite unique constraint (branch + ISBN)
+  // - Prevents duplicate ISBNs in the same branch
+  // - Example Allowed: (branch 1: ISBN-A, ISBN-B), (branch 2: ISBN-A)
+  // - Example Not Allowed: (branch 1: ISBN-A, ISBN-A again)
+  // - Query Example:
+  //   prisma.modelLevelAttributes.findFirst({
+  //     where: { branchId: 1, isbn: "978-3-16-148410-0" }
+  //   })
+  @@unique([branchId, isbn])
+
+  // Index on title
+  // - Improves performance for search/sort by title
+  // - Query Example:
+  //   prisma.modelLevelAttributes.findMany({
+  //     where: { title: "Clean Code" }
+  //   })
+  @@index([title])
+
+  // Fulltext index (DB-dependent: MySQL/Postgres only)
+  // - Enables keyword search across summaries
+  // - Example search: "software craftsmanship"
+  // - Not supported in SQLite
+  // @@fulltext([summary])
+
+  // Table name mapping
+  // - Maps Prisma model to DB table "model_level_attributes"
+  // - All Prisma queries are internally directed to this table
+  @@map("model_level_attributes")
+
+  // Prisma will not generate this model in the client
+  // @@ignore  // * Uncomment if you want to ignore this model in the Prisma Client
+}
+
+// ===============================
+// Supporting Models
+// ===============================
+
+// Branches: A library can have multiple branches
+model Branch {
+  id    Int      @id @default(autoincrement())
+  name  String
+  books ModelLevelAttributes[]
+  @@map("branches")
+}
+
+// BorrowingHistory: Tracks which user borrowed which book
+model BorrowingHistory {
+  id         Int      @id @default(autoincrement())
+  bookId     Int
+  branchId   Int
+  userId     Int
+  borrowedAt DateTime @default(now())
+
+  // Relations
+  book       ModelLevelAttributes @relation(fields: [bookId, branchId], references: [bookId, branchId])
+  user       MLDSampleUser        @relation(fields: [userId], references: [id])
+
+  @@map("borrowing_history")
+}
+
+// Users: Library members who borrow books
+model MLDSampleUser {
+  id         Int      @id @default(autoincrement())
+  name       String
+  borrowings BorrowingHistory[]
+  @@map("users")
+}

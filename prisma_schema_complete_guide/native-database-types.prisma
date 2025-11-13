@@ -1,0 +1,229 @@
+//-------------------------------------------------------------
+// 📌 Native Database Types in Prisma (`@db`)
+//-------------------------------------------------------------
+//
+// - Prisma provides generic scalar types (String, Int, Boolean, etc).
+// - By default, Prisma maps them to the "most common" DB column type.
+// - Using `@db.<Type>` overrides the column type to a **native DB type**.
+//
+// ✅ Pros of @db:
+//   - Exact control over DB schema (VARCHAR(255), DECIMAL(8,2), etc).
+//   - Compatibility with legacy schemas.
+//   - Helps fine-tune storage + indexing.
+//
+// 🚨 Cons of @db:
+//   - Locks you into a specific DB provider.
+//   - Harder to migrate between databases.
+//   - Only use when necessary (precision, legacy compatibility).
+//
+//-------------------------------------------------------------
+// PROVIDER: POSTGRESQL
+//-------------------------------------------------------------
+
+// 🔹 STRING FIELDS
+model PostgresString_Default {
+  id    Int    @id @default(autoincrement())
+  email String // Default → TEXT
+}
+
+model PostgresString_DB {
+  id    Int    @id @default(autoincrement())
+  email String @db.VarChar(5) // Explicit VARCHAR(255)
+}
+
+// 🔹 BOOLEAN
+model PostgresBoolean_Default {
+  id      Int     @id @default(autoincrement())
+  isActive Boolean // Default → BOOLEAN
+}
+
+model PostgresBoolean_DB {
+  id      Int     @id @default(autoincrement())
+  isActive Boolean @db.Boolean // Explicit BOOLEAN
+}
+
+// 🔹 INT (32-bit)
+model PostgresInt_Default {
+  id   Int @id @default(autoincrement()) 
+  // Default → INTEGER
+  @@ignore
+}
+
+
+// 🔹 BIGINT (64-bit)
+model PostgresBigInt_Default {
+  id   BigInt @id @default(autoincrement()) 
+  // Default → BIGINT
+  @@ignore
+}
+
+// 🔹 FLOAT / DOUBLE PRECISION
+model PostgresFloat_Default {
+  id    Int   @id @default(autoincrement())
+  score Float // Default → DOUBLE PRECISION
+}
+
+model PostgresFloat_DB {
+  id    Int   @id @default(autoincrement())
+  score Float @db.DoublePrecision // Explicit DOUBLE PRECISION
+}
+
+// 🔹 DECIMAL
+model PostgresDecimal_Default {
+  id    Int     @id @default(autoincrement())
+  price Decimal // Default → NUMERIC
+}
+
+model PostgresDecimal_DB {
+  id    Int     @id @default(autoincrement())
+  price Decimal @db.Decimal(10,2) // Explicit NUMERIC(10,2)
+}
+
+// 🔹 BYTES (BINARY DATA)
+model PostgresBytes_Default {
+  id      Int   @id @default(autoincrement())
+  content Bytes // Default → BYTEA
+  @@ignore
+}
+
+// 🔹 DATE & TIME
+model PostgresDate_Default {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime // Default → TIMESTAMP(3)
+}
+
+model PostgresDate_DB {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @db.Timestamptz(6) // Explicit TIMESTAMPTZ(6)
+}
+
+// 🔹 UUID
+model PostgresUuid_Default {
+  id   String @id @default(uuid()) // Default → TEXT
+}
+
+model PostgresUuid_DB {
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // Explicit UUID type
+}
+
+// 🔹 JSON
+model PostgresJson_Default {
+  id   Int   @id @default(autoincrement())
+  meta Json  // Default → JSONB
+}
+
+model PostgresJson_DB {
+  id   Int   @id @default(autoincrement())
+  meta Json  @db.Json // Explicit JSON
+}
+
+//-------------------------------------------------------------
+// PROVIDER: MYSQL
+//-------------------------------------------------------------
+
+// 🔹 STRING FIELDS
+model MysqlString_Default {
+  id    Int    @id @default(autoincrement())
+  email String // Default → VARCHAR(191)
+}
+
+model MysqlString_DB {
+  id    Int    @id @default(autoincrement())
+  email String @db.VarChar(255) // Explicit VARCHAR(255)
+}
+
+// 🔹 NUMERIC FIELDS
+model MysqlNumber_Default {
+  id    Int     @id @default(autoincrement())
+  price Decimal // Default → DECIMAL(65,30)
+}
+
+model MysqlNumber_DB {
+  id    Int     @id @default(autoincrement())
+  price Decimal @db.Decimal(10,2) // Explicit DECIMAL(10,2)
+}
+
+// 🔹 DATE & TIME
+model MysqlDate_Default {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime // Default → DATETIME(3)
+}
+
+model MysqlDate_DB {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @db.Timestamp(6) // Explicit TIMESTAMP(6)
+}
+
+//-------------------------------------------------------------
+// PROVIDER: SQLITE
+//-------------------------------------------------------------
+
+// 🔹 STRING
+model SqliteString_Default {
+  id    Int    @id @default(autoincrement())
+  email String // Default → TEXT
+}
+
+model SqliteString_DB {
+  id    Int    @id @default(autoincrement())
+  email String @db.Text // Explicit TEXT
+}
+
+// 🔹 NUMERIC
+model SqliteNumber_Default {
+  id    Int     @id @default(autoincrement())
+  price Decimal // Default → NUMERIC
+}
+
+model SqliteNumber_DB {
+  id    Int     @id @default(autoincrement())
+  price Decimal @db.Decimal(8,2) // Explicit DECIMAL(8,2)
+}
+
+//-------------------------------------------------------------
+// PROVIDER: SQL SERVER
+//-------------------------------------------------------------
+
+// 🔹 STRING
+model SqlServerString_Default {
+  id    Int    @id @default(autoincrement())
+  email String // Default → NVARCHAR(1000)
+}
+
+model SqlServerString_DB {
+  id    Int    @id @default(autoincrement())
+  email String @db.VarChar(255) // Explicit VARCHAR(255)
+}
+
+// 🔹 NUMERIC
+model SqlServerNumber_Default {
+  id    Int     @id @default(autoincrement())
+  price Decimal // Default → DECIMAL(18,0)
+}
+
+model SqlServerNumber_DB {
+  id    Int     @id @default(autoincrement())
+  price Decimal @db.Decimal(10,2) // Explicit DECIMAL(10,2)
+}
+
+//-------------------------------------------------------------
+// ✅ Gotchas & Tips
+//-------------------------------------------------------------
+// 1. Indexing:
+//    - MySQL: VARCHAR index length is limited (191 chars for utf8mb4).
+//    - Postgres: TEXT can’t be indexed efficiently → prefer VARCHAR.
+//
+// 2. Precision:
+//    - MySQL Decimal default (65,30) is huge → set with @db.Decimal(10,2).
+//
+// 3. Migration Impact:
+//    - Removing @db may cause Prisma to change column type → risky.
+//
+// 4. Best Practice:
+//    - Use Prisma defaults UNLESS you specifically need @db for:
+//      - Legacy schema compatibility.
+//      - Precision control.
+//      - Performance reasons.
+//
+//-------------------------------------------------------------

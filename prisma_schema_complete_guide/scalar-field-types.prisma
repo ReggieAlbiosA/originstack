@@ -1,0 +1,94 @@
+model ScalarFieldTypes {
+  // ! Note: Each table must have at least one unique required field.
+  // You can mark a single field with '@id', or use '@unique' on a combination of fields,
+  // or use '@@id([])' / '@@unique([])' for multi-field constraints.
+
+  // 1. textData String
+  // Purpose: Store human-readable text or encoded small binary-like data in text form.
+  // Use cases:
+  // - Usernames, product names, blog post titles
+  // - Short descriptions or labels
+  // - Email addresses
+  // Example: "john_doe", "Eco-Friendly Mug", "Breaking News: ..."
+  textData            String
+
+  // 2. boolean Boolean
+  // Purpose: Store a true/false state.
+  // Use cases:
+  // - Account activation status (isActive)
+  // - Feature toggles (isBetaUser)
+  // - Inventory status (inStock)
+  // Example: true, false
+  boolean             Boolean
+
+  // 3. bit_interger_32 Int @id @default(autoincrement())
+  // Purpose: Store integers up to 32-bit range, here also serving as the primary key.
+  // Use cases:
+  // - Auto-incrementing ID for records
+  // - Counters (e.g., number of logins)
+  // - Foreign key references to other tables
+  // Example: 1, 42, 99999
+  bit_interger_32     Int @id @default(autoincrement())
+
+  // 4. bit_interger_64 BigInt
+  // Purpose: Store very large integers (64-bit range).
+  // Use cases:
+  // - Tracking big counters (page views in billions)
+  // - Storing UNIX timestamps in milliseconds
+  // - Storing IDs from external systems
+  // Example: 9223372036854775807, 1702602000000
+  bit_interger_64     BigInt 
+
+  // 5. decimalNumber Float
+  // Purpose: Store approximate decimal values (fast but may lose precision).
+  // Use cases:
+  // - GPS coordinates
+  // - Temperature readings
+  // - Statistical data
+  // Example: 3.14159, -122.4194, 98.6
+  decimalNumber       Float
+
+  // 6. preciseDecimal Decimal
+  // Purpose: Store exact decimal values for high-precision needs.
+  // Use cases:
+  // - Cryptocurrency balances
+  // - Scientific calculations
+  // - Engineering measurements
+  // Example: 0.0000123456, 123456.7890123456
+  preciseDecimal      Decimal
+
+  // 7. ISO_date_or_time DateTime
+  // Purpose: Store dates, times, and timestamps in ISO 8601 format.
+  // Use cases:
+  // - Order creation date
+  // - Scheduled event time
+  // - User’s date of birth
+  // Example: "2025-08-14T15:30:00Z", "1998-03-25T00:00:00Z"
+  ISO_date_or_time    DateTime
+
+  // 8. arbitrary_JSON_data Json
+  // Purpose: Store structured or unstructured JSON objects.
+  // Use cases:
+  // - Dynamic metadata
+  // - Application settings
+  // - API responses
+  // Example: {"theme": "dark", "notifications": true}, [{"id":1},{"id":2}]
+  arbitrary_JSON_data Json
+
+  // 9. binaryData Bytes
+  // Purpose: Store raw binary data.
+  // Use cases:
+  // - Profile picture blobs
+  // - Encrypted files
+  // - Audio/video chunks
+  // Example: <binary>, represented in Base64: "aGVsbG8gd29ybGQ="
+  binaryData          Bytes
+}
+
+// 💡 Rule of thumb:
+// - Use String for readable text.
+// - Use Int or BigInt for counting or IDs.
+// - Use Decimal for precise math, Float for fast math.
+// - Use DateTime for any temporal value.
+// - Use Json for flexible structures.
+// - Use Bytes for actual binary blobs.

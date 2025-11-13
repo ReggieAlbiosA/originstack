@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel Pricing Guide</title>
+    <style>
+        /* --- Global Reset & Root --- */
+        :root {
+            --color-bg: #ffffff;
+            --color-text: #333333;
+            --color-heading: #111111;
+            --color-border: #eaeaea;
+            --color-code-bg: #f5f5f5;
+            --color-code-text: #222222;
+            --color-link: #007aff;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg: #111111;
+                --color-text: #cccccc;
+                --color-heading: #ffffff;
+                --color-border: #333333;
+                --color-code-bg: #222222;
+                --color-code-text: #eeeeee;
+                --color-link: #0096ff;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.65;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* --- Layout --- */
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        section,
+        footer {
+            margin-top: 2.5rem;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: var(--color-border);
+            margin: 3rem 0;
+        }
+
+        /* --- Typography --- */
+        h1,
+        h2,
+        h3 {
+            font-weight: 600;
+            color: var(--color-heading);
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p,
+        li {
+            margin-bottom: 0.75rem;
+        }
+
+        p.subtitle {
+            font-size: 1.15rem;
+            color: #777777;
+            margin-bottom: 2rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--color-heading);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background-color: var(--color-code-bg);
+            color: var(--color-code-text);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        a {
+            color: var(--color-link);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Lists --- */
+        ul,
+        ol {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        ul li::marker {
+            color: #777;
+        }
+
+        /* --- Components --- */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            background-color: var(--color-bg);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .card ul {
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .card li {
+            font-size: 0.95rem;
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--color-border);
+            font-size: 0.9rem;
+            color: #777777;
+        }
+
+        footer em {
+            font-style: italic;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            html {
+                font-size: 15px;
+            }
+
+            main {
+                padding: 1.5rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <h1>Vercel Pricing Guide</h1>
+        <p class="subtitle">A comprehensive breakdown of Vercel's pricing components and their role in modern web
+            hosting.</p>
+
+        <section id="core-tiers">
+            <h2>Core Pricing Tiers</h2>
+            <div class="card-container">
+                <div class="card">
+                    <h3>Hobby (Free)</h3>
+                    <ul>
+                        <li><strong>Cost:</strong> Free forever</li>
+                        <li><strong>Purpose:</strong> Personal projects and experimentation</li>
+                        <li><strong>Use Case:</strong> Perfect for developers learning, building portfolios, or testing
+                            applications without financial commitment</li>
+                        <li><strong>Team Size:</strong> 1 user (personal use only)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Pro ($20/user/month)</h3>
+                    <ul>
+                        <li><strong>Cost:</strong> $20 per user/month, plus usage-based pricing</li>
+                        <li><strong>Purpose:</strong> Professional developers and small teams</li>
+                        <li><strong>Use Case:</strong> Production applications with moderate to high traffic, freelance
+                            projects, and small business websites</li>
+                        <li><strong>Team Size:</strong> Unlimited team members ($20/additional member) with free viewer
+                            seats</li>
+                        <li><strong>Included Credit:</strong> $20 of usage credit per month</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Enterprise (Custom Pricing)</h3>
+                    <ul>
+                        <li><strong>Cost:</strong> Custom pricing based on requirements</li>
+                        <li><strong>Purpose:</strong> Large organizations with specific needs</li>
+                        <li><strong>Use Case:</strong> High-traffic applications, enterprise-grade SLA requirements,
+                            dedicated support, and advanced security features</li>
+                        <li><strong>Features:</strong> 99.99% SLA, advanced support, custom contracts</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="compute">
+            <h2>Compute & Functions</h2>
+
+            <h3>Fluid Compute (New Model - 2024+)</h3>
+            <ul>
+                <li><strong>What it is:</strong> Modern compute model replacing traditional GB-Hours calculation with
+                    Active CPU time and Provisioned Memory</li>
+                <li><strong>Why it matters:</strong> More accurate billing based on actual CPU usage rather than
+                    memory-time combinations</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li><strong>Active CPU Time:</strong>
+                            <ul>
+                                <li>Hobby: 4 hours/month included</li>
+                                <li>Pro: Included in usage credits, then $0.128 per hour</li>
+                            </ul>
+                        </li>
+                        <li><strong>Provisioned Memory:</strong>
+                            <ul>
+                                <li>Hobby: 360 GB-hours/month included</li>
+                                <li>Pro: Included in usage credits, then $0.0106 per GB-hour</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Handles API routes, authentication, database queries, and dynamic
+                    content generation</li>
+            </ul>
+
+            <h3>Serverless Function Invocations</h3>
+            <ul>
+                <li><strong>What it is:</strong> Number of times functions are called</li>
+                <li><strong>Why it matters:</strong> Each API request, form submission, or dynamic page load may trigger
+                    function execution</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li>Hobby: 100,000 invocations/month</li>
+                        <li>Pro: Unlimited invocations (no cap)</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> High-traffic sites need unlimited invocations to handle peak loads
+                </li>
+            </ul>
+
+            <h3>Function Duration Limits</h3>
+            <ul>
+                <li><strong>What it is:</strong> Maximum execution time per function (configurable via
+                    <code>maxDuration</code>)</li>
+                <li><strong>Why it matters:</strong> Determines how long a function can run before timing out</li>
+                <li><strong>Limits:</strong>
+                    <ul>
+                        <li>Hobby: 10 seconds max (default)</li>
+                        <li>Pro: 15 seconds default, configurable up to 60 seconds (or 300s with special config)</li>
+                        <li>Enterprise: Configurable based on needs</li>
+                    </ul>
+                </li>
+                <li><strong>Configuration:</strong> Set via <code>export const maxDuration = 15;</code> in code or
+                    <code>vercel.json</code></li>
+                <li><strong>Hosting Context:</strong> Longer durations needed for complex operations like report
+                    generation, video processing, or external API calls</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="edge-network">
+            <h2>Edge Network & CDN</h2>
+
+            <h3>Fast Data Transfer</h3>
+            <ul>
+                <li><strong>What it is:</strong> The amount of data transferred from Vercel's edge network to end users
+                </li>
+                <li><strong>Why it matters:</strong> Every time someone visits your website, images load, or APIs are
+                    called, data is transferred. Vercel's global CDN ensures fast delivery worldwide</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li>Hobby: 100 GB/month included</li>
+                        <li>Pro: 1 TB/month included</li>
+                        <li>Additional: $0.15 per GB</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> High bandwidth is crucial for media-rich sites, popular blogs,
+                    e-commerce platforms, and any high-traffic application</li>
+            </ul>
+
+            <h3>Edge Requests</h3>
+            <ul>
+                <li><strong>What it is:</strong> Number of requests handled at the edge (CDN level)</li>
+                <li><strong>Why it matters:</strong> Edge requests are served from the nearest geographic location to
+                    your users, providing ultra-low latency</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li>Hobby: 1 million requests/month</li>
+                        <li>Pro: 10 million requests/month</li>
+                        <li>Additional: Usage-based pricing</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Essential for global performance - users in Asia, Europe, and
+                    Americas all get fast response times</li>
+            </ul>
+
+            <h3>Fast Origin Transfer</h3>
+            <ul>
+                <li><strong>What it is:</strong> Data transferred from your origin (source) to Vercel's edge network
+                </li>
+                <li><strong>Why it matters:</strong> First-time requests fetch data from origin and cache at edge</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li>Hobby: 10 GB/month included</li>
+                        <li>Pro: Included in usage credits</li>
+                        <li>Additional: $0.40 per GB</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Important for dynamic content and cache misses</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="build-deployment">
+            <h2>Build & Deployment</h2>
+
+            <h3>Build Execution Time</h3>
+            <ul>
+                <li><strong>What it is:</strong> Time spent compiling and building your application</li>
+                <li><strong>Why it matters:</strong> Every deployment triggers a build process (compiling TypeScript,
+                    bundling assets, generating static pages)</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li>Hobby: No specific limit (fair use)</li>
+                        <li>Pro: 200 hours/month included, then usage-based</li>
+                        <li>Additional: Usage-based pricing after included amount</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Large applications or frequent deployments consume more build
+                    time; essential for CI/CD workflows</li>
+            </ul>
+
+            <h3>Build Performance</h3>
+            <ul>
+                <li><strong>What it is:</strong> Build speed and queue priority</li>
+                <li><strong>Benefits:</strong>
+                    <ul>
+                        <li>Hobby: Standard build speed, may queue during high usage</li>
+                        <li>Pro: Faster builds with no queues, priority processing</li>
+                        <li>Enterprise: Custom build infrastructure</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Teams need fast, reliable builds to maintain development velocity
+                </li>
+            </ul>
+
+            <h3>Concurrent Builds</h3>
+            <ul>
+                <li><strong>What it is:</strong> Number of builds that can run simultaneously</li>
+                <li><strong>Why it matters:</strong> Multiple team members pushing code or preview deployments can
+                    trigger parallel builds</li>
+                <li><strong>Limits:</strong> Based on plan tier and team size</li>
+                <li><strong>Hosting Context:</strong> Teams need concurrent builds to avoid deployment queues</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="analytics">
+            <h2>Web Analytics & Monitoring</h2>
+
+            <h3>Web Analytics Events</h3>
+            <ul>
+                <li><strong>What it is:</strong> Built-in privacy-friendly analytics (no cookies required)</li>
+                <li><strong>Why it matters:</strong> Track page views, user behavior, and site performance without
+                    third-party tools</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li>Hobby: 50,000 events/month included</li>
+                        <li>Pro: Included in base, then $3 per 100,000 events (prorated)</li>
+                        <li>Enterprise: Custom pricing</li>
+                    </ul>
+                </li>
+                <li><strong>Features:</strong>
+                    <ul>
+                        <li>1-month reporting window (Hobby)</li>
+                        <li>Extended reporting (Pro/Enterprise)</li>
+                        <li>Privacy-compliant (GDPR-friendly)</li>
+                        <li>No consent banners required</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Essential for understanding user behavior and site performance
+                </li>
+            </ul>
+
+            <h3>Web Analytics Data Transfer</h3>
+            <ul>
+                <li><strong>What it is:</strong> Bandwidth used by analytics collection</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li>Hobby: 10 GB/month included</li>
+                        <li>Pro: Included in bandwidth allocation</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Analytics data collection has minimal bandwidth impact</li>
+            </ul>
+
+            <h3>Real User Monitoring (Speed Insights)</h3>
+            <ul>
+                <li><strong>What it is:</strong> Track actual user performance metrics (Core Web Vitals, etc.)</li>
+                <li><strong>Why it matters:</strong> Monitor real-world performance, not just synthetic tests</li>
+                <li><strong>Pricing Impact:</strong> Included in Pro and Enterprise</li>
+                <li><strong>Hosting Context:</strong> Essential for maintaining SEO rankings and user experience quality
+                </li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="storage">
+            <h2>Storage Products</h2>
+
+            <h3>Vercel Blob Storage</h3>
+            <ul>
+                <li><strong>What it is:</strong> Object storage for files, images, and media</li>
+                <li><strong>Why it matters:</strong> Store and serve large files without bundling in deployments</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li><strong>Storage Size:</strong> 1 GB included, then $0.023 per GB/month</li>
+                        <li><strong>Simple Operations:</strong> 10,000 included, then $0.40 per 1M</li>
+                        <li><strong>Advanced Operations:</strong> 2,000 included, then $5.00 per 1M</li>
+                        <li><strong>Data Transfer:</strong> 10 GB included, then $0.05 per GB</li>
+                        <li><strong>Edge Requests:</strong> 1M/month included</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Essential for user uploads, media libraries, and asset management
+                </li>
+            </ul>
+
+            <h3>Vercel KV (Redis)</h3>
+            <ul>
+                <li><strong>What it is:</strong> Redis-compatible key-value database at the edge</li>
+                <li><strong>Why it matters:</strong> Fast data access for caching, sessions, and simple data storage
+                </li>
+                <li><strong>Pricing Impact:</strong> Separate usage-based pricing</li>
+                <li><strong>Use Cases:</strong> Rate limiting, feature flags, shopping carts, session management</li>
+            </ul>
+
+            <h3>Vercel Postgres</h3>
+            <ul>
+                <li><strong>What it is:</strong> Serverless Postgres database</li>
+                <li><strong>Why it matters:</strong> Full relational database without infrastructure management</li>
+                <li><strong>Pricing Impact:</strong> Separate usage-based pricing</li>
+                <li><strong>Use Cases:</strong> Structured data, user accounts, complex queries</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="dev-tools">
+            <h2>Developer Tools & Features</h2>
+
+            <h3>Vercel Sandbox</h3>
+            <ul>
+                <li><strong>What it is:</strong> Cloud development environments for testing and development</li>
+                <li><strong>Why it matters:</strong> Spin up isolated environments for experimentation</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li><strong>Active CPU:</strong> 5 hours/month included, then $0.128/hour</li>
+                        <li><strong>Provisioned Memory:</strong> 420 GB-hours/month included, then $0.0106/GB-hour</li>
+                        <li><strong>Network:</strong> 20 GB/month included, then $0.15/GB</li>
+                        <li><strong>Sandbox Creations:</strong> 5,000/month included, then $0.60 per 1M</li>
+                        <li><strong>Concurrent Sandboxes:</strong> 10 (Hobby)</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Rapid prototyping and testing without affecting production</li>
+            </ul>
+
+            <h3>Edge Config</h3>
+            <ul>
+                <li><strong>What it is:</strong> Ultra-fast, globally replicated configuration store with
+                    sub-millisecond read access</li>
+                <li><strong>Why it matters:</strong> Store feature flags, redirects, and config data that needs instant
+                    global availability</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li><strong>Reads:</strong> 1 million/month included (all plans)</li>
+                        <li><strong>Writes:</strong> 100/month included (all plans)</li>
+                        <li><strong>Additional usage:</strong> Contact sales for higher limits</li>
+                    </ul>
+                </li>
+                <li><strong>Access Methods:</strong> SDK (<code>@vercel/edge-config</code>), REST API with read tokens
+                </li>
+                <li><strong>Use Cases:</strong> Feature flags, A/B testing, dynamic configuration, LaunchDarkly/Statsig
+                    integration</li>
+            </ul>
+
+            <h3>Image Optimization</h3>
+            <ul>
+                <li><strong>What it is:</strong> Automatic image resizing, format conversion (WebP/AVIF), and
+                    compression via Next.js <code>&lt;Image&gt;</code> component</li>
+                <li><strong>Why it matters:</strong> Images are often the largest assets on websites; optimization
+                    reduces load times and bandwidth</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li><strong>Cache Reads:</strong> 300,000/month included (all plans)</li>
+                        <li><strong>Cache Writes:</strong> 100,000/month included (all plans)</li>
+                        <li><strong>Additional usage:</strong> Usage-based pricing for overages</li>
+                    </ul>
+                </li>
+                <li><strong>Optimization Features:</strong>
+                    <ul>
+                        <li>Automatic format selection (WebP, AVIF)</li>
+                        <li>Responsive image sizing</li>
+                        <li>Lazy loading</li>
+                        <li>Remote and local image support</li>
+                    </ul>
+                </li>
+                <li><strong>Cost Control:</strong> Use <code>unoptimized</code> prop for small/SVG/animated images,
+                    configure <code>minimumCacheTTL</code> for longer caching</li>
+                <li><strong>Hosting Context:</strong> Critical for e-commerce, blogs, portfolios, and any image-heavy
+                    site</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="ai-features">
+            <h2>AI & Advanced Features</h2>
+
+            <h3>AI Gateway</h3>
+            <ul>
+                <li><strong>What it is:</strong> Managed gateway for AI model APIs with caching, rate limiting, and
+                    monitoring</li>
+                <li><strong>Why it matters:</strong> Optimize AI API costs and performance</li>
+                <li><strong>Pricing Impact:</strong>
+                    <ul>
+                        <li>Hobby: $5 AI Gateway credits/month</li>
+                        <li>Pro: Usage-based pricing at provider's list price (no markup)</li>
+                    </ul>
+                </li>
+                <li><strong>Use Cases:</strong> AI-powered features, chatbots, content generation</li>
+            </ul>
+
+            <h3>Cold Start Prevention</h3>
+            <ul>
+                <li><strong>What it is:</strong> Keep functions warm to eliminate cold start latency</li>
+                <li><strong>Availability:</strong> Pro and Enterprise only</li>
+                <li><strong>Why it matters:</strong> Ensures consistent fast response times for critical endpoints</li>
+                <li><strong>Hosting Context:</strong> Essential for user-facing APIs where latency matters</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="security">
+            <h2>Security & Compliance</h2>
+
+            <h3>DDoS Mitigation</h3>
+            <ul>
+                <li><strong>What it is:</strong> Automatic protection against distributed denial-of-service attacks</li>
+                <li><strong>Availability:</strong> Included in all plans (Enhanced on Enterprise)</li>
+                <li><strong>Why it matters:</strong> Prevents malicious traffic from overwhelming your application</li>
+                <li><strong>Hosting Context:</strong> Critical for any public-facing application to maintain uptime</li>
+            </ul>
+
+            <h3>Web Application Firewall (WAF)</h3>
+            <ul>
+                <li><strong>What it is:</strong> Protect against common web vulnerabilities (SQL injection, XSS, etc.)
+                </li>
+                <li><strong>Availability:</strong>
+                    <ul>
+                        <li>Hobby: Standard WAF</li>
+                        <li>Pro: Advanced WAF</li>
+                        <li>Enterprise: Managed WAF rulesets</li>
+                    </ul>
+                </li>
+                <li><strong>Hosting Context:</strong> Essential security layer for production applications</li>
+            </ul>
+
+            <h3>SSL/TLS Certificates</h3>
+            <ul>
+                <li><strong>What it is:</strong> Automatic HTTPS encryption for all domains</li>
+                <li><strong>Availability:</strong> Free and automatic on all plans</li>
+                <li><strong>Why it matters:</strong> Secures data transmission and required for modern web standards
+                </li>
+                <li><strong>Hosting Context:</strong> Mandatory for SEO, browser trust indicators, and user security
+                </li>
+            </ul>
+
+            <h3>Deployment Protection</h3>
+            <ul>
+                <li><strong>What it is:</strong> Password or authentication-based access control for deployments</li>
+                <li><strong>Availability:</strong>
+                    <ul>
+                        <li>Pro: Standard protection (password/Vercel auth)</li>
+                        <li>Enterprise: Advanced protection with SSO</li>
+                    </ul>
+                </li>
+                <li><strong>Use Cases:</strong> Staging environments, client previews, internal tools</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="collaboration">
+            <h2>Collaboration Features</h2>
+
+            <h3>Custom Domains</h3>
+            <ul>
+                <li><strong>What it is:</strong> Use your own domain names (e.g., yoursite.com)</li>
+                <li><strong>Availability:</strong> Unlimited on all plans</li>
+                <li><strong>Why it matters:</strong> Professional branding instead of <code>vercel.app</code> subdomain
+                </li>
+                <li><strong>Hosting Context:</strong> Essential for production websites and brand identity</li>
+            </ul>
+
+            <h3>Preview Deployments</h3>
+            <ul>
+                <li><strong>What it is:</strong> Automatic deployments for every git branch/pull request</li>
+                <li><strong>Availability:</strong> Unlimited on all plans</li>
+                <li><strong>Why it matters:</strong> Test changes in production-like environment before merging</li>
+                <li><strong>Hosting Context:</strong> Enables safe development workflow and stakeholder previews</li>
+            </ul>
+
+            <h3>Instant Rollback</h3>
+            <ul>
+                <li><strong>What it is:</strong> Revert to any previous deployment instantly</li>
+                <li><strong>Availability:</strong> Included in all plans</li>
+                <li><strong>Why it matters:</strong> Quickly recover from bugs or issues in production</li>
+                <li><strong>Hosting Context:</strong> Zero-downtime rollback strategy for production safety</li>
+            </ul>
+
+            <h3>Team Features (Pro+)</h3>
+            <ul>
+                <li><strong>Team Members:</strong> $20 per member/month (full access with roles: MEMBER, DEVELOPER,
+                    ADMIN)</li>
+                <li><strong>Viewer Seats:</strong> Free read-only access for stakeholders (VIEWER role)</li>
+                <li><strong>Project-Level Permissions:</strong> Assign different roles per project</li>
+                <li><strong>Advanced Spend Management:</strong> Usage caps and alerts</li>
+                <li><strong>Access to Enterprise Add-ons:</strong> Scale features as needed</li>
+                <li><strong>Team Collaboration:</strong> Unlimited projects and domains</li>
+                <li><strong>Invite Management:</strong> Programmatic team invitations via API</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="enterprise">
+            <h2>Enterprise-Only Features</h2>
+
+            <h3>Service Level Agreement (SLA)</h3>
+            <ul>
+                <li><strong>What it is:</strong> 99.99% uptime guarantee</li>
+                <li><strong>Why it matters:</strong> Financial guarantees for availability</li>
+                <li><strong>Hosting Context:</strong> Mission-critical applications need uptime guarantees</li>
+            </ul>
+
+            <h3>Advanced Security</h3>
+            <ul>
+                <li><strong>Features:</strong>
+                    <ul>
+                        <li>SOC 2 compliance</li>
+                        <li>Security questionnaires</li>
+                        <li>Penetration testing support</li>
+                        <li>SCIM and Directory Sync</li>
+                    </ul>
+                </li>
+                <li><strong>Why it matters:</strong> Meet regulatory and compliance requirements</li>
+                <li><strong>Hosting Context:</strong> Required for healthcare, finance, and enterprise customers</li>
+            </ul>
+
+            <h3>Single Sign-On (SSO)</h3>
+            <ul>
+                <li><strong>What it is:</strong> SAML integration with corporate identity providers</li>
+                <li><strong>Why it matters:</strong> Centralized authentication and access control</li>
+                <li><strong>Hosting Context:</strong> Enterprise security and compliance requirements</li>
+            </ul>
+
+            <h3>Multi-Region Compute & Failover</h3>
+            <ul>
+                <li><strong>What it is:</strong> Deploy functions to specific regions with automatic failover</li>
+                <li><strong>Why it matters:</strong> Data residency compliance and improved reliability</li>
+                <li><strong>Hosting Context:</strong> GDPR compliance, latency optimization, disaster recovery</li>
+            </ul>
+
+            <h3>Dedicated Support</h3>
+            <ul>
+                <li><strong>Features:</strong>
+                    <ul>
+                        <li>Priority support channels</li>
+                        <li>Slack Connect</li>
+                        <li>Dedicated success manager</li>
+                        <li>Custom support SLAs</li>
+                    </ul>
+                </li>
+                <li><strong>Why it matters:</strong> Fast resolution of issues and strategic guidance</li>
+                <li><strong>Hosting Context:</strong> Enterprise applications can't afford extended downtime</li>
+            </ul>
+
+            <h3>Guest & Team Access Controls</h3>
+            <ul>
+                <li><strong>What it is:</strong> Granular permissions and role-based access control</li>
+                <li><strong>Why it matters:</strong> Secure collaboration for large teams</li>
+                <li><strong>Hosting Context:</strong> Enterprise security and compliance</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="cost-optimization">
+            <h2>Cost Optimization Strategies</h2>
+            <ol>
+                <li>
+                    <h3>Maximize Edge Caching</h3>
+                    <ul>
+                        <li>Use <code>Cache-Control</code> headers effectively</li>
+                        <li>Leverage Vercel's CDN for static assets</li>
+                        <li>Implement ISR for dynamic content with reasonable revalidation times</li>
+                    </ul>
+                </li>
+                <li>
+                    <h3>Optimize Compute Usage</h3>
+                    <ul>
+                        <li>Minimize function execution time</li>
+                        <li>Use edge functions for simple logic (cheaper than serverless)</li>
+                        <li>Implement efficient database queries</li>
+                        <li>Cache expensive operations</li>
+                    </ul>
+                </li>
+                <li>
+                    <h3>Image Optimization</h3>
+                    <ul>
+                        <li>Always use Next.js <code>&lt;Image&gt;</code> component or <code>@vercel/og</code></li>
+                        <li>Serve images in modern formats (WebP/AVIF)</li>
+                        <li>Use appropriate image sizes</li>
+                        <li>Leverage image CDN caching</li>
+                    </ul>
+                </li>
+                <li>
+                    <h3>Static Generation Strategy</h3>
+                    <ul>
+                        <li>Pre-render pages at build time (SSG) when possible</li>
+                        <li>Use ISR for content that updates periodically</li>
+                        <li>Reserve SSR for truly dynamic content</li>
+                    </ul>
+                </li>
+                <li>
+                    <h3>Monitor and Alert</h3>
+                    <ul>
+                        <li>Set up spend management alerts</li>
+                        <li>Track usage in Vercel dashboard</li>
+                        <li>Identify usage spikes and optimize</li>
+                        <li>Right-size your plan based on actual usage</li>
+                    </ul>
+                </li>
+                <li>
+                    <h3>Efficient Data Transfer</h3>
+                    <ul>
+                        <li>Compress API responses</li>
+                        <li>Minimize payload sizes</li>
+                        <li>Use pagination for large datasets</li>
+                        <li>Implement efficient data fetching strategies</li>
+                    </ul>
+                </li>
+                <li>
+                    <h3>Smart Architecture</h3>
+                    <ul>
+                        <li>Use edge functions for authentication checks</li>
+                        <li>Implement rate limiting to prevent abuse</li>
+                        <li>Cache API responses when appropriate</li>
+                        <li>Use Vercel KV for session storage instead of database</li>
+                    </ul>
+                </li>
+            </ol>
+        </section>
+
+        <hr>
+
+        <section id="usage-summary">
+            <h2>Usage-Based Pricing Summary</h2>
+            <p>Vercel uses a <strong>usage-based pricing model</strong> for most resources:</p>
+            <ul>
+                <li><strong>Included amounts</strong> in your plan (Hobby or Pro)</li>
+                <li><strong>Overage charges</strong> when you exceed included amounts</li>
+                <li><strong>Pro plan includes $20 usage credit</strong> monthly</li>
+                <li><strong>Predictable costs</strong> with spend management tools</li>
+            </ul>
+
+            <h3>Key Metrics to Monitor:</h3>
+            <ol>
+                <li>Fast Data Transfer (bandwidth)</li>
+                <li>Active CPU time</li>
+                <li>Provisioned Memory</li>
+                <li>Edge requests</li>
+                <li>Build execution time</li>
+                <li>Web Analytics events</li>
+                <li>Storage operations (if using Blob/KV/Postgres)</li>
+            </ol>
+        </section>
+
+        <hr>
+
+        <section id="calculator">
+            <h2>Pricing Calculator Considerations</h2>
+            <p>When estimating costs, evaluate:</p>
+
+            <h3>Traffic & Performance</h3>
+            <ul>
+                <li>Monthly page views and unique visitors</li>
+                <li>Geographic distribution of users</li>
+                <li>API call volume and complexity</li>
+                <li>Expected bandwidth consumption</li>
+            </ul>
+
+            <h3>Compute Requirements</h3>
+            <ul>
+                <li>Function execution frequency</li>
+                <li>Average function duration</li>
+                <li>Memory requirements</li>
+                <li>Need for cold start prevention</li>
+            </ul>
+
+            <h3>Content & Assets</h3>
+            <ul>
+                <li>Number and size of images</li>
+                <li>Media file requirements</li>
+                <li>Static vs dynamic content ratio</li>
+            </ul>
+
+            <h3>Team & Workflow</h3>
+            <ul>
+                <li>Number of developers</li>
+                <li>Deployment frequency</li>
+                <li>Need for preview deployments</li>
+                <li>Collaboration requirements</li>
+            </ul>
+
+            <h3>Compliance & Security</h3>
+            <ul>
+                <li>Security requirements (SSO, advanced WAF)</li>
+                <li>Compliance needs (SOC 2, GDPR)</li>
+                <li>SLA requirements</li>
+                <li>Support level needed</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="migration">
+            <h2>Migration from Traditional Hosting</h2>
+
+            <h3>Cost Comparison vs Traditional Hosting:</h3>
+            <p><strong>Traditional VPS/Dedicated Server:</strong></p>
+            <ul>
+                <li>Fixed costs ($50-500+/month)</li>
+                <li>Over-provisioned for average load</li>
+                <li>Manual scaling and maintenance</li>
+                <li>No built-in CDN or edge network</li>
+            </ul>
+            <p><strong>Vercel:</strong></p>
+            <ul>
+                <li>Pay for actual usage</li>
+                <li>Automatic scaling</li>
+                <li>Zero maintenance</li>
+                <li>Global CDN included</li>
+                <li>Often cheaper for variable traffic</li>
+            </ul>
+
+            <h3>When Vercel Makes Sense:</h3>
+            <ul>
+                <li>✅ JAMstack applications</li>
+                <li>✅ Next.js, React, Vue, Svelte projects</li>
+                <li>✅ Variable traffic patterns</li>
+                <li>✅ Global audience</li>
+                <li>✅ Fast development cycles</li>
+                <li>✅ Small to medium teams</li>
+            </ul>
+
+            <h3>When to Consider Alternatives:</h3>
+            <ul>
+                <li>❌ Extremely high, consistent traffic (may be cheaper on dedicated infrastructure)</li>
+                <li>❌ Long-running processes (&gt;5 minutes)</li>
+                <li>❌ Legacy applications not compatible with serverless</li>
+                <li>❌ Specific compliance requirements not met by Vercel</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="faq">
+            <h2>Frequently Asked Questions</h2>
+
+            <h3>Do I get charged for preview deployments?</h3>
+            <p>Preview deployments consume bandwidth, build time, and compute resources just like production, but
+                they're included in your plan limits.</p>
+
+            <h3>What happens if I exceed my limits on Hobby?</h3>
+            <p>Most resources will stop working until the monthly reset. Consider upgrading to Pro for production
+                applications.</p>
+
+            <h3>Can I set spending limits?</h3>
+            <p>Yes, Pro and Enterprise plans offer spend management with configurable limits and alerts.</p>
+
+            <h3>Are serverless functions always running?</h3>
+            <p>No, they spin up on-demand (cold start), but Pro includes cold start prevention for critical functions.
+            </p>
+
+            <h3>How does the $20 usage credit work?</h3>
+            <p>On Pro plan, each member includes $20 of usage credit that applies to overages before additional charges.
+            </p>
+
+            <h3>Is bandwidth charged for failed requests?</h3>
+            <p>No, only successful responses consume bandwidth allocation.</p>
+        </section>
+
+        <footer>
+            <h2>Additional Notes</h2>
+
+            <h3>Documentation Sources</h3>
+            <p>This guide is based on official Vercel documentation including:</p>
+            <ul>
+                <li>Vercel Pricing Page</li>
+                <li>Vercel Functions Documentation</li>
+                <li>Vercel Storage Documentation</li>
+                <li>Vercel Analytics Documentation</li>
+                <li>Vercel REST API Reference</li>
+                <li>Vercel Configuration Documentation</li>
+            </ul>
+
+            <h3>Important Clarifications</h3>
+            <ol>
+                <li><strong>Cron Jobs:</strong> Hobby plans have hourly accuracy (<code>* 8 * * *</code>), while Pro+
+                    have minute-level accuracy (<code>5 8 * * *</code>)</li>
+                <li><strong>Routing Middleware:</strong> Runs on Edge runtime by default, can be configured to use
+                    Node.js runtime</li>
+                <li><strong>Build Cache:</strong> Automatically enabled for all frameworks (Next.js:
+                    <code>.next/cache/**</code>, Nuxt: <code>.nuxt/**</code>, etc.)</li>
+                <li><strong>waitUntil():</strong> Available for extending request lifetime for background tasks after
+                    response is sent</li>
+                <li><strong>SIGTERM Handling:</strong> 500ms cleanup window for graceful function shutdown</li>
+                <li><strong>Image Optimization Paths:</strong> <code>/_next/image</code> (Next.js) or
+                    <code>/_vercel/image</code> (general)</li>
+                <li><strong>Multipart Upload:</strong> Supported for Vercel Blob with minimum 5MB per part (except last
+                    part)</li>
+                <li><strong>Edge Config Updates:</strong> Instant global propagation (sub-millisecond reads) after write
+                </li>
+                <li><strong>Analytics Privacy:</strong> GDPR-compliant, no cookies required, can implement
+                    <code>beforeSend</code> filtering</li>
+                <li><strong>Function Regions:</strong> Configurable via <code>regions</code> in <code>vercel.json</code>
+                    or <code>preferredRegion</code> in code</li>
+            </ol>
+
+            <p><em>Last Updated: January 2025</em><br>
+                <em>Note: Pricing and features subject to change. Always refer to <a
+                        href="https://vercel.com/pricing">vercel.com/pricing</a> for current rates.</em><br>
+                <em>This guide reflects Vercel's modern pricing model with Fluid Compute and usage-based
+                    billing.</em><br>
+                <em>Information sourced from official Vercel documentation via MCP Vercel Server.</em>
+            </p>
+        </footer>
+
+    </main>
+
+</body>
+
+</html>

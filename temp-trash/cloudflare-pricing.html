@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Pricing Guide</title>
+    <style>
+        /* --- Global Reset & Root --- */
+        :root {
+            --color-bg: #ffffff;
+            --color-text: #333333;
+            --color-heading: #111111;
+            --color-border: #eaeaea;
+            --color-code-bg: #f5f5f5;
+            --color-code-text: #222222;
+            --color-link: #f38020;
+            --color-accent: #ff6633;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg: #111111;
+                --color-text: #cccccc;
+                --color-heading: #ffffff;
+                --color-border: #333333;
+                --color-code-bg: #222222;
+                --color-code-text: #eeeeee;
+                --color-link: #ff9966;
+                --color-accent: #ff8855;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.65;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* --- Layout --- */
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        section,
+        footer {
+            margin-top: 2.5rem;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: var(--color-border);
+            margin: 3rem 0;
+        }
+
+        /* --- Typography --- */
+        h1,
+        h2,
+        h3 {
+            font-weight: 600;
+            color: var(--color-heading);
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p,
+        li {
+            margin-bottom: 0.75rem;
+        }
+
+        p.subtitle {
+            font-size: 1.15rem;
+            color: #777777;
+            margin-bottom: 2rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--color-heading);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background-color: var(--color-code-bg);
+            color: var(--color-code-text);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        a {
+            color: var(--color-link);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Lists --- */
+        ul,
+        ol {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        ul li::marker {
+            color: #777;
+        }
+
+        /* --- Components --- */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            background-color: var(--color-bg);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(255, 102, 51, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--color-accent);
+        }
+
+        .card ul {
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .card li {
+            font-size: 0.95rem;
+        }
+
+        .highlight-box {
+            background-color: var(--color-code-bg);
+            border-left: 4px solid var(--color-accent);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--color-border);
+            font-size: 0.9rem;
+            color: #777777;
+        }
+
+        footer em {
+            font-style: italic;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            html {
+                font-size: 15px;
+            }
+
+            main {
+                padding: 1.5rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main>
+        <h1>Cloudflare Pricing Guide</h1>
+        <p class="subtitle">A comprehensive breakdown of Cloudflare's pricing for Workers, Pages, R2, D1, Images, and
+            edge computing services.</p>
+
+        <section id="core-tiers">
+            <h2>Core Pricing Tiers</h2>
+            <div class="card-container">
+                <div class="card">
+                    <h3>Workers Free</h3>
+                    <ul>
+                        <li><strong>Cost:</strong> $0/month</li>
+                        <li><strong>Purpose:</strong> Personal projects, testing, and learning</li>
+                        <li><strong>Requests:</strong> 100,000 per day</li>
+                        <li><strong>CPU Time:</strong> 10ms per invocation</li>
+                        <li><strong>Use Case:</strong> Ideal for developers experimenting with edge computing, building
+                            hobby projects, or prototyping</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Workers Paid (Standard)</h3>
+                    <ul>
+                        <li><strong>Cost:</strong> $5/month minimum</li>
+                        <li><strong>Purpose:</strong> Production applications with significant traffic</li>
+                        <li><strong>Requests:</strong> 10 million/month included</li>
+                        <li><strong>CPU Time:</strong> 30 million CPU ms/month</li>
+                        <li><strong>Key Benefit:</strong> No bandwidth/egress charges</li>
+                        <li><strong>Use Case:</strong> Commercial websites, APIs, microservices</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Enterprise</h3>
+                    <ul>
+                        <li><strong>Cost:</strong> Custom pricing (contact sales)</li>
+                        <li><strong>Purpose:</strong> Large-scale applications with enterprise requirements</li>
+                        <li><strong>Features:</strong> Custom SLA, dedicated support, advanced security</li>
+                        <li><strong>Use Case:</strong> High-traffic applications, custom compliance needs</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="workers">
+            <h2>Cloudflare Workers</h2>
+
+            <h3>Requests</h3>
+            <ul>
+                <li><strong>What it is:</strong> Number of times your Worker code is invoked by HTTP requests</li>
+                <li><strong>Pricing:</strong>
+                    <ul>
+                        <li>Free: 100,000 requests per day (resets at midnight UTC)</li>
+                        <li>Paid: 10 million requests/month + $0.30 per additional million</li>
+                    </ul>
+                </li>
+                <li><strong>Important:</strong> Requests to static assets are FREE and UNLIMITED</li>
+            </ul>
+
+            <h3>CPU Time</h3>
+            <ul>
+                <li><strong>What it is:</strong> Actual compute time your Worker uses during execution (measured in
+                    milliseconds)</li>
+                <li><strong>Why it matters:</strong> Only active execution counts - waiting for APIs doesn't</li>
+                <li><strong>Pricing:</strong>
+                    <ul>
+                        <li>Free: 10ms per invocation max</li>
+                        <li>Paid: 30 million CPU ms/month + $0.02 per additional million</li>
+                    </ul>
+                </li>
+                <li><strong>Maximum Limits:</strong>
+                    <ul>
+                        <li>HTTP requests: 5 minutes max (default: 30 seconds)</li>
+                        <li>Cron Triggers: 15 minutes max</li>
+                        <li>Queue Consumers: 15 minutes max</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Duration</h3>
+            <ul>
+                <li><strong>What it is:</strong> Total wall-clock time from start to end</li>
+                <li><strong>Pricing:</strong> No charge or limit for duration</li>
+                <li><strong>Example:</strong> Worker waits 10 seconds for API but uses only 50ms CPU = charged for 50ms
+                    only</li>
+            </ul>
+
+            <h3>Workers Static Assets</h3>
+            <ul>
+                <li><strong>What it is:</strong> Host static files directly in your Worker</li>
+                <li><strong>Pricing:</strong> Requests to static assets are FREE and UNLIMITED</li>
+                <li><strong>Limits:</strong>
+                    <ul>
+                        <li>Free: 20,000 files per Worker version</li>
+                        <li>Paid: 100,000 files per Worker version</li>
+                        <li>Max file size: 25 MB per file</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="kv">
+            <h2>Workers KV (Key-Value Storage)</h2>
+            <p><strong>What it is:</strong> Globally distributed key-value data store, optimized for high-read,
+                low-write scenarios with eventual consistency.</p>
+
+            <h3>Operations Pricing</h3>
+            <ul>
+                <li><strong>Read Operations:</strong>
+                    <ul>
+                        <li>Free: 100,000 reads per day</li>
+                        <li>Paid: 10 million/month + $0.50 per million</li>
+                    </ul>
+                </li>
+                <li><strong>Write Operations:</strong>
+                    <ul>
+                        <li>Free: 1,000 writes per day</li>
+                        <li>Paid: 1 million/month + $5.00 per million</li>
+                    </ul>
+                </li>
+                <li><strong>Delete Operations:</strong>
+                    <ul>
+                        <li>Free: 1,000 deletes per day</li>
+                        <li>Paid: 1 million/month + $5.00 per million</li>
+                    </ul>
+                </li>
+                <li><strong>List Operations:</strong>
+                    <ul>
+                        <li>Free: 1,000 list operations per day</li>
+                        <li>Paid: 1 million/month + $5.00 per million</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Storage Capacity</h3>
+            <ul>
+                <li><strong>All plans:</strong> 1 GB included</li>
+                <li><strong>Overage:</strong> $0.50 per GB-month</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>💡 No Egress Fees:</strong> Workers KV does not charge for data transfer or egress.</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="durable-objects">
+            <h2>Durable Objects</h2>
+            <p><strong>What it is:</strong> Strongly consistent, stateful objects for coordination, real-time
+                collaboration, and transactional storage at the edge.</p>
+
+            <h3>Compute Pricing</h3>
+            <ul>
+                <li><strong>Requests:</strong>
+                    <ul>
+                        <li>Free: 100,000 requests per day</li>
+                        <li>Paid: 1 million/month + $0.15 per million</li>
+                        <li>Includes: HTTP requests, RPC sessions, WebSocket messages, alarm invocations</li>
+                        <li>WebSocket billing: 20:1 ratio (100 messages = 5 billed requests)</li>
+                    </ul>
+                </li>
+                <li><strong>Duration (GB-seconds):</strong>
+                    <ul>
+                        <li>Free: 13,000 GB-seconds per day</li>
+                        <li>Paid: 400,000 GB-seconds/month + $12.50 per million</li>
+                        <li>Example: Object using 128 MB for 1 hour = 450 GB-seconds</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Storage Pricing (SQLite Backend)</h3>
+            <ul>
+                <li><strong>Rows Read:</strong>
+                    <ul>
+                        <li>Free: 5 million per day</li>
+                        <li>Paid: 25 billion/month + $0.001 per million rows</li>
+                    </ul>
+                </li>
+                <li><strong>Rows Written:</strong>
+                    <ul>
+                        <li>Free: 100,000 per day</li>
+                        <li>Paid: 50 million/month + $1.00 per million rows</li>
+                    </ul>
+                </li>
+                <li><strong>Stored Data:</strong>
+                    <ul>
+                        <li>Free: 5 GB total</li>
+                        <li>Paid: 5 GB + $0.20 per GB-month</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="r2">
+            <h2>R2 Storage</h2>
+            <p><strong>What it is:</strong> S3-compatible object storage with <strong>zero egress fees</strong>, built
+                on Cloudflare's global network.</p>
+
+            <h3>Storage Pricing</h3>
+            <ul>
+                <li><strong>Standard Storage:</strong> $0.015 per GB-month</li>
+                <li><strong>Infrequent Access:</strong> $0.01 per GB-month (30-day minimum)</li>
+                <li><strong>Free Tier:</strong> 10 GB-month per month</li>
+            </ul>
+
+            <h3>Operations Pricing</h3>
+            <ul>
+                <li><strong>Class A Operations</strong> (writes, lists):
+                    <ul>
+                        <li>Standard: $4.50 per million requests</li>
+                        <li>Infrequent Access: $9.00 per million requests</li>
+                        <li>Free: 1 million/month</li>
+                    </ul>
+                </li>
+                <li><strong>Class B Operations</strong> (reads):
+                    <ul>
+                        <li>Standard: $0.36 per million requests</li>
+                        <li>Infrequent Access: $0.90 per million requests</li>
+                        <li>Free: 10 million/month</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Data Retrieval</h3>
+            <ul>
+                <li><strong>Standard:</strong> None</li>
+                <li><strong>Infrequent Access:</strong> $0.01 per GB</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>🎉 Zero Egress Fees:</strong> Egressing directly from R2 is completely FREE - no data
+                    transfer charges!</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="d1">
+            <h2>D1 Database</h2>
+            <p><strong>What it is:</strong> Serverless SQL database (SQLite) with global read replication.</p>
+
+            <h3>Pricing</h3>
+            <ul>
+                <li><strong>Rows Read:</strong>
+                    <ul>
+                        <li>Free: 5 million per day</li>
+                        <li>Paid: 25 billion/month + $0.001 per million rows</li>
+                    </ul>
+                </li>
+                <li><strong>Rows Written:</strong>
+                    <ul>
+                        <li>Free: 100,000 per day</li>
+                        <li>Paid: 50 million/month + $1.00 per million rows</li>
+                    </ul>
+                </li>
+                <li><strong>Storage:</strong>
+                    <ul>
+                        <li>Free: 5 GB total</li>
+                        <li>Paid: 5 GB + $0.75 per GB-month</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Limits</h3>
+            <ul>
+                <li><strong>Maximum Database Size:</strong> 10 GB (Paid) / 500 MB (Free)</li>
+                <li><strong>Databases per Account:</strong> 50,000 (Paid) / 10 (Free)</li>
+                <li><strong>Time Travel:</strong> 30 days (Paid) / 7 days (Free)</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>💡 No Egress Fees:</strong> No data transfer or bandwidth charges for D1.</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="images">
+            <h2>Cloudflare Images</h2>
+            <p><strong>What it is:</strong> Image storage, optimization, and transformation service.</p>
+
+            <h3>Free Plan</h3>
+            <ul>
+                <li><strong>Images Transformed:</strong> 5,000 unique transformations/month (free)</li>
+                <li><strong>Use Case:</strong> Optimize images stored outside Cloudflare (R2, external URLs)</li>
+            </ul>
+
+            <h3>Paid Plan</h3>
+            <ul>
+                <li><strong>Images Transformed:</strong> 5,000 included + $0.50 per 1,000 unique transformations/month
+                </li>
+                <li><strong>Images Stored:</strong> $5 per 100,000 images/month</li>
+                <li><strong>Images Delivered:</strong> $1 per 100,000 images delivered/month</li>
+            </ul>
+
+            <h3>Transformations Details</h3>
+            <ul>
+                <li><strong>Unique Transformation:</strong> Counted once per 30-day sliding window</li>
+                <li><strong>Format Auto:</strong> Counts as 1 transformation (not multiple for AVIF/WebP)</li>
+                <li><strong>Supported Formats:</strong> JPEG, PNG, GIF, WebP, AVIF, SVG, HEIC</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="pages">
+            <h2>Cloudflare Pages</h2>
+            <p><strong>What it is:</strong> JAMstack platform for deploying static sites and full-stack applications.
+            </p>
+
+            <h3>Pricing</h3>
+            <ul>
+                <li><strong>Static Asset Requests:</strong> FREE and UNLIMITED on all plans</li>
+                <li><strong>Pages Functions:</strong> Billed as Workers (same pricing)</li>
+                <li><strong>Builds:</strong> 500 builds/month (Free) - see Pro/Business for more</li>
+            </ul>
+
+            <h3>Limits</h3>
+            <ul>
+                <li><strong>Files:</strong> 20,000 files per deployment</li>
+                <li><strong>File Size:</strong> 25 MB max per file</li>
+                <li><strong>Custom Domains:</strong> 100 (Free) / 250 (Pro) / 500 (Business+)</li>
+                <li><strong>Build Timeout:</strong> 20 minutes</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="vectorize">
+            <h2>Vectorize (Vector Database)</h2>
+            <p><strong>What it is:</strong> Vector database for AI-powered search, recommendations, and similarity
+                matching.</p>
+
+            <h3>Pricing</h3>
+            <ul>
+                <li><strong>Queried Vector Dimensions:</strong>
+                    <ul>
+                        <li>Free: 30 million/month</li>
+                        <li>Paid: 50 million/month + $0.01 per million</li>
+                    </ul>
+                </li>
+                <li><strong>Stored Vector Dimensions:</strong>
+                    <ul>
+                        <li>Free: 5 million</li>
+                        <li>Paid: 10 million + $0.05 per 100 million</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Calculation Example</h3>
+            <p>For 10,000 vectors with 768 dimensions, making 1,000 queries:</p>
+            <ul>
+                <li>Queried dimensions: (10,000 + 1,000) × 768 = 8,448,000</li>
+                <li>Stored dimensions: 10,000 × 768 = 7,680,000</li>
+            </ul>
+
+            <h3>Limits</h3>
+            <ul>
+                <li><strong>Indexes:</strong> 50,000 (Paid) / 100 (Free)</li>
+                <li><strong>Max Dimensions:</strong> 1536 per vector</li>
+                <li><strong>Max Vectors per Index:</strong> 5,000,000</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="additional">
+            <h2>Additional Services</h2>
+
+            <h3>Hyperdrive (Database Acceleration)</h3>
+            <ul>
+                <li><strong>What it is:</strong> Connection pooling and caching for PostgreSQL/MySQL</li>
+                <li><strong>Pricing:</strong>
+                    <ul>
+                        <li>Free: 100,000 queries per day</li>
+                        <li>Paid: Unlimited queries</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Workers Builds (CI/CD)</h3>
+            <ul>
+                <li><strong>Build Minutes:</strong>
+                    <ul>
+                        <li>Free: 3,000 per month</li>
+                        <li>Paid: 6,000 per month + $0.005 per minute</li>
+                    </ul>
+                </li>
+                <li><strong>Concurrent Builds:</strong> 1 (Free) / 6 (Paid)</li>
+                <li><strong>Build Timeout:</strong> 20 minutes</li>
+            </ul>
+
+            <h3>Browser Rendering</h3>
+            <ul>
+                <li><strong>Free:</strong> 10 minutes per day</li>
+                <li><strong>Paid:</strong> Contact for custom limits</li>
+                <li><strong>Concurrent Browsers:</strong> 3 per account</li>
+            </ul>
+
+            <h3>Queues</h3>
+            <ul>
+                <li><strong>Operations:</strong> 1 million/month + $0.40 per million</li>
+                <li><strong>Note:</strong> Each 64 KB chunk counts as one operation</li>
+            </ul>
+
+            <h3>Workflows (Orchestration)</h3>
+            <ul>
+                <li><strong>Pricing:</strong> Same as Workers + storage costs</li>
+                <li><strong>Storage:</strong> 1 GB + $0.20 per GB-month (billing starts Sept 2025)</li>
+            </ul>
+
+            <h3>Workers Logs</h3>
+            <ul>
+                <li><strong>Log Events:</strong>
+                    <ul>
+                        <li>Free: 200,000 per day</li>
+                        <li>Paid: 20 million/month + $0.60 per million</li>
+                    </ul>
+                </li>
+                <li><strong>Retention:</strong> 3 days (Free) / 7 days (Paid)</li>
+                <li><strong>Note:</strong> Billing starts April 21, 2025</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="limits">
+            <h2>Account & Worker Limits</h2>
+
+            <h3>Worker Size Limits</h3>
+            <ul>
+                <li><strong>Free:</strong> 3 MB compressed</li>
+                <li><strong>Paid:</strong> 10 MB compressed</li>
+            </ul>
+
+            <h3>Number of Workers</h3>
+            <ul>
+                <li><strong>Free:</strong> 100 Workers per account</li>
+                <li><strong>Paid:</strong> 500 Workers per account</li>
+            </ul>
+
+            <h3>Environment Variables</h3>
+            <ul>
+                <li><strong>Free:</strong> 64 variables per Worker</li>
+                <li><strong>Paid:</strong> 128 variables per Worker</li>
+                <li><strong>Max Size:</strong> 5 KB per variable</li>
+            </ul>
+
+            <h3>Subrequests</h3>
+            <ul>
+                <li><strong>Free:</strong> 50 subrequests per request</li>
+                <li><strong>Paid:</strong> 1,000 subrequests per request</li>
+            </ul>
+
+            <h3>Cron Triggers</h3>
+            <ul>
+                <li><strong>Free:</strong> 5 Cron Triggers per account</li>
+                <li><strong>Paid:</strong> 250 Cron Triggers per account</li>
+            </ul>
+
+            <h3>Memory</h3>
+            <ul>
+                <li><strong>All plans:</strong> 128 MB per isolate</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="examples">
+            <h2>Pricing Examples</h2>
+
+            <h3>Example 1: Small API</h3>
+            <ul>
+                <li><strong>Traffic:</strong> 15 million requests/month</li>
+                <li><strong>CPU:</strong> 7ms average per request</li>
+                <li><strong>Monthly Cost:</strong>
+                    <ul>
+                        <li>Subscription: $5.00</li>
+                        <li>Requests: $1.50 [(15M - 10M) / 1M × $0.30]</li>
+                        <li>CPU Time: $1.50 [(15M × 7ms - 30M) / 1M × $0.02]</li>
+                        <li><strong>Total: $8.00</strong></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Example 2: High-Traffic Website</h3>
+            <ul>
+                <li><strong>Traffic:</strong> 100 million requests/month</li>
+                <li><strong>CPU:</strong> 7ms average per request</li>
+                <li><strong>Monthly Cost:</strong>
+                    <ul>
+                        <li>Subscription: $5.00</li>
+                        <li>Requests: $27.00 [(100M - 10M) / 1M × $0.30]</li>
+                        <li>CPU Time: $13.40 [(100M × 7ms - 30M) / 1M × $0.02]</li>
+                        <li><strong>Total: $45.40</strong></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Example 3: Static Site with Dynamic Functions</h3>
+            <ul>
+                <li><strong>Traffic:</strong> 15 million requests/month</li>
+                <li><strong>Static:</strong> 12 million (80%) - FREE</li>
+                <li><strong>Dynamic:</strong> 3 million (20%) with Functions</li>
+                <li><strong>CPU:</strong> 7ms per dynamic request</li>
+                <li><strong>Monthly Cost:</strong>
+                    <ul>
+                        <li>Subscription: $5.00</li>
+                        <li>Static Requests: $0.00 (free and unlimited)</li>
+                        <li>Dynamic Requests: $0.00 (within 10M tier)</li>
+                        <li>CPU Time: $0.00 (within 30M tier)</li>
+                        <li><strong>Total: $5.00</strong></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="optimization">
+            <h2>Cost Optimization Tips</h2>
+            <ol>
+                <li><strong>Leverage Static Assets:</strong> Serve static content directly to avoid Worker invocations
+                </li>
+                <li><strong>Optimize CPU Time:</strong> Minimize computationally expensive operations</li>
+                <li><strong>Cache Aggressively:</strong> Use Cache API or KV to reduce repeated processing</li>
+                <li><strong>Batch Operations:</strong> Group multiple operations to reduce request counts</li>
+                <li><strong>Use Service Bindings:</strong> Inter-Worker communication is free on Standard pricing</li>
+                <li><strong>Monitor Limits:</strong> Set CPU limits to prevent runaway costs</li>
+                <li><strong>Smart KV Usage:</strong> Use KV for read-heavy workloads</li>
+                <li><strong>Durable Objects:</strong> Let objects hibernate when inactive</li>
+                <li><strong>Use Indexes:</strong> D1 indexes reduce rows read significantly</li>
+                <li><strong>R2 for Media:</strong> Store large files in R2 with zero egress fees</li>
+            </ol>
+        </section>
+
+        <hr>
+
+        <section id="advantages">
+            <h2>Key Advantages</h2>
+
+            <div class="highlight-box">
+                <h3>🚀 No Idle Costs</h3>
+                <p>Pay only for actual requests and CPU time, not for servers running 24/7</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🌍 Global by Default</h3>
+                <p>Code automatically deploys to 275+ locations worldwide</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3>📡 No Bandwidth Charges</h3>
+                <p>Unlimited data transfer included - no surprise bills from traffic spikes</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3>⚡ Zero Cold Starts</h3>
+                <p>Workers use V8 isolates, not containers - sub-millisecond startup times</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🛡️ Built-in DDoS Protection</h3>
+                <p>Automatic protection included at no extra cost</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🔒 Free SSL/TLS</h3>
+                <p>Automatic HTTPS encryption for all domains</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="comparison">
+            <h2>Cloudflare vs Traditional Hosting</h2>
+
+            <h3>Traditional VPS/Cloud</h3>
+            <ul>
+                <li>Fixed costs ($50-500+/month)</li>
+                <li>Over-provisioned for average load</li>
+                <li>Manual scaling and maintenance</li>
+                <li>Separate CDN and egress fees</li>
+                <li>Cold starts (containers)</li>
+            </ul>
+
+            <h3>Cloudflare</h3>
+            <ul>
+                <li>Pay per request + CPU time</li>
+                <li>Automatic, instant scaling</li>
+                <li>Zero maintenance</li>
+                <li>No bandwidth/egress charges</li>
+                <li>Sub-millisecond cold starts</li>
+            </ul>
+
+            <h3>Perfect For:</h3>
+            <ul>
+                <li>✅ Edge computing and middleware</li>
+                <li>✅ API gateways and microservices</li>
+                <li>✅ Static sites with dynamic functionality</li>
+                <li>✅ Real-time applications</li>
+                <li>✅ Global applications requiring low latency</li>
+            </ul>
+
+            <h3>Not Ideal For:</h3>
+            <ul>
+                <li>❌ Long-running batch processing (&gt;5 minutes)</li>
+                <li>❌ CPU-intensive workloads (video encoding, ML training)</li>
+                <li>❌ Applications requiring &gt;128 MB memory per request</li>
+                <li>❌ Legacy applications requiring specific runtimes</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section id="faq">
+            <h2>Frequently Asked Questions</h2>
+
+            <h3>Do I get charged for failed requests?</h3>
+            <p>No. You are not charged for requests that return unauthorized (401) errors.</p>
+
+            <h3>What happens if I exceed Free plan limits?</h3>
+            <p>Most resources will stop working until the daily reset at midnight UTC. Upgrade to Paid for production.
+            </p>
+
+            <h3>Are there egress/bandwidth charges?</h3>
+            <p>No! Cloudflare does not charge for data transfer, egress, or bandwidth on Workers, R2, D1, or KV.</p>
+
+            <h3>How is CPU time calculated?</h3>
+            <p>Only active execution counts. Waiting for external APIs or database queries doesn't count toward CPU
+                time.</p>
+
+            <h3>Can I use multiple storage products together?</h3>
+            <p>Yes! Use R2 for large files, KV for read-heavy data, D1 for relational data, and Durable Objects for
+                stateful coordination.</p>
+
+            <h3>Do static asset requests count toward Worker requests?</h3>
+            <p>No! Requests to static assets are FREE and UNLIMITED on all plans.</p>
+        </section>
+
+        <footer>
+            <h2>Additional Notes</h2>
+
+            <h3>Documentation Sources</h3>
+            <p>This guide is based on official Cloudflare documentation including:</p>
+            <ul>
+                <li>Cloudflare Workers Pricing</li>
+                <li>R2 Storage Documentation</li>
+                <li>D1 Database Documentation</li>
+                <li>Durable Objects Documentation</li>
+                <li>Images Documentation</li>
+                <li>Vectorize Documentation</li>
+                <li>Pages Documentation</li>
+            </ul>
+
+            <h3>Important Clarifications</h3>
+            <ol>
+                <li><strong>No Egress Fees:</strong> Cloudflare does not charge for bandwidth, data transfer, or egress
+                    on any platform services</li>
+                <li><strong>Static Assets:</strong> Requests to static assets in Workers or Pages are completely free
+                    and unlimited</li>
+                <li><strong>Global Network:</strong> All services run on 275+ locations worldwide automatically</li>
+                <li><strong>CPU vs Duration:</strong> CPU time is wall-clock time when actively executing - waiting
+                    doesn't count</li>
+                <li><strong>Workers Logs Billing:</strong> Starts April 21, 2025</li>
+                <li><strong>Workflows Storage Billing:</strong> Starts September 15, 2025</li>
+                <li><strong>Limits:</strong> Many limits can be increased by request for Paid/Enterprise accounts</li>
+                <li><strong>Free Plan Resets:</strong> Daily limits reset at midnight UTC</li>
+            </ol>
+
+            <p><em>Last Updated: January 2025</em><br>
+                <em>Note: Pricing and features subject to change. Always refer to <a
+                        href="https://developers.cloudflare.com/workers/platform/pricing">Cloudflare Pricing</a> for
+                    current rates.</em><br>
+                <em>Information sourced from official Cloudflare documentation via MCP Cloudflare Server.</em>
+            </p>
+        </footer>
+
+    </main>
+
+</body>
+
+</html>

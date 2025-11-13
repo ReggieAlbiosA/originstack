@@ -1,0 +1,113 @@
+model AttributesForFields {
+  // id Int
+  // Purpose: Primary key for identifying each user uniquely.
+  // Use cases:
+  // - Reference in other tables (foreign key)
+  // - Lookup and filtering by ID
+  // - Ensuring uniqueness for each record
+  // Example: 1, 42, 1001
+  id        Int       @id @default(autoincrement()) @map("user_id") 
+  /// @map("user_id") → Keeps DB column name from legacy schema or external systems.
+
+  // email String
+  // Purpose: Stores the user's email address, unique per user.
+  // Use cases:
+  // - Login credential
+  // - Contact and notification
+  // - Account verification
+  // Example: "john@example.com", "alice@domain.com"
+  email     String    @unique @map("email_address")
+  /// @map("email_address") → Matches existing DB column "email_address".
+
+  // name String
+  // Purpose: Stores the user's full name.
+  // Use cases:
+  // - Display in UI
+  // - Search/filter users by name
+  // - Default value if user hasn’t set a name
+  // Example: "John Doe", "Alice Smith"
+  name      String    @default("Anonymous") @map("full_name")
+  /// @map("full_name") → DB column uses full_name, Prisma uses `name`.
+
+  // createdAt DateTime
+  // Purpose: Records when the user record was created.
+  // Use cases:
+  // - Sorting and filtering by signup date
+  // - Activity tracking
+  // - Analytics on user growth
+  // Example: "2025-08-16T21:00:00Z"
+  createdAt DateTime  @default(now()) @map("created_at")
+  /// @map("created_at") → Follows DB's snake_case convention.
+
+  // updatedAt DateTime
+  // Purpose: Automatically updated timestamp on record change.
+  // Use cases:
+  // - Data change tracking
+  // - Last activity display
+  // - Syncing data with external systems
+  // Example: "2025-08-16T22:15:00Z"
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  /// @map("updated_at") → Keeps DB in sync while Prisma code stays camelCase.
+
+  // posts Post[]
+  // Purpose: Relation to multiple posts authored by the user.
+  // Use cases:
+  // - Fetching all posts from a given user
+  // - Cascading deletions if user is removed
+  // - Analytics per author
+  // Example: Posts authored by user with id=1
+  posts     Post[]
+  /// Relation field → Automatically handled by Prisma, no @map needed
+}
+
+model Post {
+  // id Int
+  // Purpose: Primary key for identifying each post uniquely.
+  // Use cases:
+  // - Reference in comments or tags
+  // - Sorting and filtering by ID
+  // - Ensuring uniqueness for each post
+  // Example: 1, 101, 2025
+  id        Int      @id @default(autoincrement()) @map("post_id")
+  /// @map("post_id") → Matches existing DB column name.
+
+  // title String
+  // Purpose: Stores the post's title.
+  // Use cases:
+  // - Display as headline in UI
+  // - Search optimization
+  // - SEO metadata
+  // Example: "Introducing Prisma 5", "Top 10 JavaScript Tips"
+  title     String   @db.VarChar(255) @map("post_title")
+  /// @map("post_title") → DB stores title in "post_title".
+
+  // content String?
+  // Purpose: Optional post content (nullable).
+  // Use cases:
+  // - Store article body, notes, or details
+  // - Allow empty content for drafts
+  // - Support rich text in serialized form
+  // Example: "Prisma 5 introduces major performance improvements..."
+  content   String?  @map("post_content")
+  /// @map("post_content") → DB uses "post_content".
+
+  // authorId Int
+  // Purpose: Foreign key referencing User model.
+  // Use cases:
+  // - Link post to its author
+  // - Join queries between users and posts
+  // - Enforce relational integrity
+  // Example: 1 (refers to user with id=1)
+  authorId  Int      @map("author_id")
+  /// @map("author_id") → Matches User's `@map("user_id")`.
+
+  // author User
+  // Purpose: Relation to the User model.
+  // Use cases:
+  // - Access post author details directly
+  // - Enable nested queries (include author in post fetch)
+  // - Cascade deletions or updates
+  // Example: User with id=1, name="John Doe"
+  author    AttributesForFields     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  /// Relation to User model.
+}

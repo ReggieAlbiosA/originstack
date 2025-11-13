@@ -1,0 +1,167 @@
+//-------------------------------------------------------------
+// 📌 One-to-Many Relationship
+// Example: A User can have many Posts, 
+// but each Post belongs to exactly one User.
+//
+// ✅ Use Case:
+//   - Blog: One author writes multiple posts.
+//   - E-commerce: One customer has many orders.
+//   - Social: One user has many uploaded photos.
+//
+// 🔑 Example Data:
+//   One_to_many (User)
+//     { id: 1 }
+//   R_Post (Posts)
+//     { id: 1, userId: 1 }
+//     { id: 2, userId: 1 }
+//     { id: 3, userId: 1 }
+//   → User 1 has 3 posts.
+//-------------------------------------------------------------
+model One_to_many {
+  id    Int      @id @default(autoincrement())
+  posts R_Post[] // One user → many posts
+}
+
+model R_Post {
+  id     Int          @id @default(autoincrement())
+  userId Int          // Foreign key → points to One_to_many.id
+  user   One_to_many  @relation(fields: [userId], references: [id])
+}
+
+
+//-------------------------------------------------------------
+// 📌 One-to-One Relationship
+// Example: A User has exactly one Profile, 
+// and a Profile belongs to exactly one User.
+//
+// ✅ Use Case:
+//   - User + Profile details (bio, avatar, settings).
+//   - Account + Subscription record.
+//   - Customer + Address record.
+//
+// 🔑 Example Data:
+//   One_to_one (User)
+//     { id: 1 }
+//   Profile
+//     { id: 1, userId: 1 }
+//   → User 1 has Profile 1 (cannot have two profiles).
+//-------------------------------------------------------------
+model One_to_one {
+  id      Int      @id @default(autoincrement())
+  profile Profile? // Optional, ensures 0 or 1 profile per user
+}
+
+model Profile {
+  id     Int        @id @default(autoincrement())
+  userId Int        @unique // Enforces one profile per user
+  user   One_to_one @relation(fields: [userId], references: [id])
+}
+
+
+//-------------------------------------------------------------
+// 📌 Many-to-Many Relationship (Implicit)
+// Example: A Student can enroll in many Classes,
+// and a Class can have many Students.
+//
+// ✅ Use Case:
+//   - Students & Classes.
+//   - Users & Roles.
+//   - Movies & Genres.
+//
+// 🔑 Example Data:
+//   Student
+//     { id: 1 }  // Alice
+//     { id: 2 }  // Bob
+//   Class
+//     { id: 1 }  // Math
+//     { id: 2 }  // Science
+//   Auto-generated join (behind the scenes):
+//     Alice → Math & Science
+//     Bob   → Math
+//-------------------------------------------------------------
+model Student {
+  id      Int      @id @default(autoincrement())
+  classes Class[]  // Many students ↔ many classes
+}
+
+model Class {
+  id       Int        @id @default(autoincrement())
+  students Student[]  // Many classes ↔ many students
+}
+
+
+
+//-------------------------------------------------------------
+// 📌 Many-to-Many Relationship (Explicit)
+// Example: A Product can have many Tags,
+// and a Tag can belong to many Products.
+//
+// ✅ Use Case:
+//   - Products & Tags (explicit join allows extra info).
+//   - Users & Groups (with role field).
+//   - Orders & Products (with quantity, price).
+//
+// 🔑 Example Data:
+//   Product
+//     { id: 1, name: "Laptop" }
+//     { id: 2, name: "Phone" }
+//   Tag
+//     { id: 1, name: "Electronics" }
+//     { id: 2, name: "Sale" }
+//   ProductsOnTags
+//     { productId: 1, tagId: 1 } // Laptop → Electronics
+//     { productId: 1, tagId: 2 } // Laptop → Sale
+//     { productId: 2, tagId: 1 } // Phone  → Electronics
+//-------------------------------------------------------------
+model ProductsOnTags {
+  productId Int
+  tagId     Int
+
+  product   Product @relation(fields: [productId], references: [id])
+  tag       Tag     @relation(fields: [tagId], references: [id])
+
+  @@id([productId, tagId]) // Composite primary key
+}
+
+model Product {
+  id    Int              @id @default(autoincrement())
+  name  String
+  tags  ProductsOnTags[] // A product can have many tags
+}
+
+model Tag {
+  id       Int              @id @default(autoincrement())
+  name     String
+  products ProductsOnTags[] // A tag can apply to many products
+}
+
+
+// * Relation Options
+//-------------------------------------------------------------
+
+//   model Post {
+//   id      Int   @id @default(autoincrement())
+
+  // Foreign key column that links Post → User
+//   userId  Int   
+
+  // Relation field that maps to User
+//   user    User  @relation(
+//     fields: [userId],     
+//     references: [id],    
+//     onDelete: Cascade,    
+//     onUpdate: Cascade       
+//   )
+// }
+
+// model User {
+//   id    Int     @id @default(autoincrement())
+
+  // Reverse relation: one User can have many Posts
+//   posts Post[]
+// }
+
+    // fields: [userId],       👈 The local FK field(s) on Post
+    // references: [id],       👈 The target field(s) on User being referenced
+    // onDelete: Cascade,      👈 Behavior when User is deleted
+    // onUpdate: Cascade       👈 Behavior when User.id is updated

@@ -1,0 +1,51 @@
+// =============================
+// ENUMS
+// =============================
+
+// Example: User roles for authentication/authorization
+// - ADMIN: Full system control
+// - USER: Default role with basic access
+// - MODERATOR: Can manage user-generated content
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+// Example: Order status in an e-commerce workflow
+// - PENDING: Order placed, awaiting processing
+// - SHIPPED: Order dispatched to the customer
+// - DELIVERED: Customer received the order
+// - CANCELLED: Order cancelled by user/system
+enum OrderStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+// =============================
+// MODELS USING ENUMS
+// =============================
+
+// User model with role-based access
+// Example data:
+// { id: 1, name: "Alice", role: "ADMIN" }
+// { id: 2, name: "Bob", role: "USER" }
+model User {
+  id    Int   @id @default(autoincrement())
+  name  String
+  role  Role  @default(USER)
+
+  @@map("enums_users") // Maps to "enums_users" table
+}
+
+// Order model with status tracking
+// Example data:
+// { id: 1, amount: 49.99, status: "PENDING" }
+// { id: 2, amount: 89.99, status: "SHIPPED" }
+model Order {
+  id      Int          @id @default(autoincrement())
+  amount  Float
+  status  OrderStatus  @default(PENDING)
+}

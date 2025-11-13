@@ -1,0 +1,2291 @@
+"use client"
+
+import * as React from "react"
+import {
+    Calculator,
+    Zap,
+    HardDrive,
+    Image as ImageIcon,
+    Database,
+    Activity,
+    GitBranch,
+    TrendingUp,
+    Info,
+    RotateCcw,
+    Shield,
+    Settings2,
+    RefreshCw
+} from "lucide-react"
+import { SiNextdotjs, SiCloudflare } from "react-icons/si"
+import { PageTitle } from "./_components/page-title"
+import { InputSlider } from "@/components/hosting-calculator/input-slider"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn-ui/tabs"
+import { cn } from "@/lib/utils"
+
+type Provider = "vercel" | "cloudflare"
+
+type VercelInputs = {
+
+    // * Vercel Delivery Network
+    // Edge Network
+    edgeRequests: number // per month
+    fastDataTransfer: number // GB per month
+
+
+    // * Vercel Firewall
+    // Firewall
+    rateLimitingRequests: number // million allowed requests per month
+    botId: undefined | number // bot ID
+
+
+    // * Content, Caching & Optimization
+    // ISR (Incremental Static Regeneration)
+    isrReads: number // per month
+    isrWrites: number // per month
+
+    // Storage (Blob)
+    blobStorageSize: number // GB
+    blobSimpleOps: number // per month
+    blobAdvancedOps: number // per month
+    blobDataTransfer: number // GB per month
+
+    // Image Optimization
+    imageCacheReads: number // per month
+    imageCacheWrites: number // per month
+    imageTransformations: number // unique per month
+
+    // Edge Config
+    edgeConfigReads: number // per month
+    edgeConfigWrites: number // per month
+
+
+    // * Vercel Compute
+    // Vercel Functions
+    functionActiveCpuTime: number // hours per month
+    provisionedMemory: number // GB-hours per month
+    invocations: number // number of invocations
+
+    // Vercel Sandbox
+    sandboxActiveCpuTime: number // hours per month
+    sandboxProvisionedMemory: number // GB-hours per month
+    sandboxInvocations: number // number of invocations
+    sandboxCreations: number // number of sandbox creations
+    sandboxNetwork: number // number of sandbox creations
+
+    // Fast Origin Transfer
+    fastOriginTransfer: number // GB per month
+
+    // Vercel Workflow
+    steps: number // hours per month
+    storage: number
+
+
+    // * Build & Deploy
+    //  Build Minues
+    standardMachines: number
+    enhancedMachines: number
+    turboMachines: number
+
+    // * Observability
+    webAnalytics: number
+
+
+}
+
+type CloudflareInputs = {
+    // Workers
+    workerRequests: number // per month
+    cpuTimeMs: number // total CPU milliseconds per month
+
+    // KV Storage
+    kvReads: number // per month
+    kvWrites: number // per month
+    kvStorageGb: number // GB
+
+    // R2 Storage
+    r2StorageGb: number // GB
+    r2ClassAOps: number // writes/lists per month
+    r2ClassBOps: number // reads per month
+
+    // D1 Database
+    d1RowsRead: number // per month
+    d1RowsWritten: number // per month
+    d1StorageGb: number // GB
+
+    // Images
+    imageTransformations: number // unique per month
+    imagesStored: number // total images
+    imagesDelivered: number // per month
+}
+
+type CloudflarePlan = "free" | "paid" | "custom"
+type VercelPlan = "hobby" | "pro" | "enterprise"
+type CloudflareService = "workers" | "r2" | "d1" | "images"
+
+// Vercel Pricing (from vercel-pricing.html)
+function calculateVercelCost(inputs: VercelInputs, teamMembers: number = 1, plan: VercelPlan = "hobby") {
+    // Base pricing - only Pro plan has subscription fee
+    const PRICE_PER_SEAT = plan === "pro" ? 20 : 0 // $20/user/month for Pro, $0 for Hobby
+    const CREDIT_PER_SEAT = plan === "pro" ? 20 : 0 // $20 usage credit per seat for Pro, $0 for Hobby
+    const BASE_PRICE = PRICE_PER_SEAT * teamMembers
+    const INCLUDED_CREDIT = CREDIT_PER_SEAT * teamMembers
+
+    // Edge Network (different limits for Hobby vs Pro)
+    const EDGE_REQUESTS_INCLUDED = plan === "pro" ? 10_000_000 : 1_000_000 // 10M for Pro, 1M for Hobby
+    const EDGE_REQUESTS_PRICE = 2.00 / 1_000_000 // $2 per 1M requests (after included)
+    const FAST_DATA_TRANSFER_INCLUDED = plan === "pro" ? 1000 : 100 // 1TB for Pro, 100GB for Hobby
+    const FAST_DATA_TRANSFER_PRICE = 0.15 // per GB (after included)
+    const FAST_ORIGIN_TRANSFER_INCLUDED = 10 // 10 GB included in both plans
+    const FAST_ORIGIN_TRANSFER_PRICE = 0.06 // per GB (starting at)
+
+    // Vercel Functions (Pro plan includes)
+    const FUNCTION_ACTIVE_CPU_INCLUDED = 4 // 4 hours included in Hobby
+    const FUNCTION_ACTIVE_CPU_PRICE = 0.128 // per hour (starting at)
+    const FUNCTION_PROVISIONED_MEMORY_INCLUDED = 360 // 360 GB-hrs included in Hobby
+    const FUNCTION_PROVISIONED_MEMORY_PRICE = 0.0106 // per GB-hour (starting at)
+    const FUNCTION_INVOCATIONS_INCLUDED = 1_000_000 // 1M included in Hobby
+    const FUNCTION_INVOCATIONS_PRICE = 0.60 / 1_000_000 // $0.60 per 1M (starting at)
+
+    // Vercel Sandbox (Pro plan includes)
+    const SANDBOX_ACTIVE_CPU_INCLUDED = 5 // 5 hours included in Hobby
+    const SANDBOX_ACTIVE_CPU_PRICE = 0.128 // per hour (starting at)
+    const SANDBOX_PROVISIONED_MEMORY_INCLUDED = 420 // 420 GB-hrs included in Hobby
+    const SANDBOX_PROVISIONED_MEMORY_PRICE = 0.0106 // per GB-hour (starting at)
+    const SANDBOX_CREATIONS_INCLUDED = 5_000 // 5K included in Hobby
+    const SANDBOX_CREATIONS_PRICE = 0.60 / 1_000_000 // $0.60 per 1M (starting at)
+    const SANDBOX_NETWORK_INCLUDED = 20 // 20 GB included in Hobby
+    const SANDBOX_NETWORK_PRICE = 0.15 // per GB (starting at)
+
+    // Vercel Workflow (Pro plan includes)
+    const WORKFLOW_STEPS_INCLUDED = 50_000 // 50K steps included in Hobby
+    const WORKFLOW_STEPS_PRICE = 2.50 / 100_000 // $2.50 per 100K
+    const WORKFLOW_STORAGE_INCLUDED = 1 // 1 GB included in Hobby
+    const WORKFLOW_STORAGE_PRICE = 0.50 // per GB
+
+    // Build Minutes (Pro plan pricing)
+    const STANDARD_MACHINE_PRICE = 0.014 // per minute (starting at)
+    const ENHANCED_MACHINE_PRICE = 0.028 // per minute (starting at)
+    const TURBO_MACHINE_PRICE = 0.126 // per minute (starting at)
+
+    // Image Optimization
+    const IMAGE_TRANSFORMATIONS_INCLUDED = 5_000 // 5K included in Hobby
+    const IMAGE_TRANSFORMATIONS_PRICE = 0.05 / 1_000 // $0.05 per 1K (starting at)
+    const IMAGE_CACHE_READS_INCLUDED = 300_000 // 300K included in Hobby
+    const IMAGE_CACHE_READS_PRICE = 0.40 / 1_000_000 // $0.40 per 1M reads (starting at)
+    const IMAGE_CACHE_WRITES_INCLUDED = 100_000 // 100K included in Hobby
+    const IMAGE_CACHE_WRITES_PRICE = 4.00 / 1_000_000 // $4 per 1M writes (starting at)
+
+    // Web Analytics
+    const ANALYTICS_EVENTS_PRICE = 3 / 100_000 // $3 per 100k events
+
+    // Blob Storage
+    const BLOB_STORAGE_INCLUDED = 1 // GB included in Hobby
+    const BLOB_STORAGE_PRICE = 0.023 // per GB/month
+    const BLOB_SIMPLE_OPS_INCLUDED = 10_000 // 10K included in Hobby
+    const BLOB_SIMPLE_OPS_PRICE = 0.40 / 1_000_000
+    const BLOB_ADVANCED_OPS_INCLUDED = 2_000 // 2K included in Hobby
+    const BLOB_ADVANCED_OPS_PRICE = 5.00 / 1_000_000
+    const BLOB_DATA_TRANSFER_INCLUDED = 10 // GB per month included in Hobby
+    const BLOB_DATA_TRANSFER_PRICE = 0.05 // per GB (starting at)
+
+    // Edge Config
+    const EDGE_CONFIG_READS_INCLUDED = 100_000 // 100K included in Hobby
+    const EDGE_CONFIG_READS_PRICE = 3.00 / 1_000_000 // $3 per 1M reads
+    const EDGE_CONFIG_WRITES_INCLUDED = 100 // 100 included in Hobby
+    const EDGE_CONFIG_WRITES_PRICE = 5.00 / 500 // $5 per 500 writes
+
+    // ISR (Incremental Static Regeneration)
+    const ISR_READS_INCLUDED = 1_000_000 // 1M included in Hobby
+    const ISR_READS_PRICE = 0.40 / 1_000_000 // $0.40 per 1M reads
+    const ISR_WRITES_INCLUDED = 200_000 // 200K included in Hobby
+    const ISR_WRITES_PRICE = 4.00 / 1_000_000 // $4 per 1M writes
+
+    // Firewall
+    const RATE_LIMITING_INCLUDED = 1_000_000 // 1M included in Hobby
+    const RATE_LIMITING_PRICE = 0.50 / 1_000_000 // $0.50 per 1M allowed requests (starting at)
+    const BOTID_DEEP_ANALYSIS_PRICE = 1.00 / 1_000 // $1 per 1K Deep Analysis checks
+
+    // Edge Requests - $2 per 1M after 10M included (Pro)
+    const edgeRequestsCost = Math.max(0, inputs.edgeRequests - EDGE_REQUESTS_INCLUDED) * EDGE_REQUESTS_PRICE
+
+    // Fast Data Transfer - $0.15 per GB after 1TB included (Pro)
+    const fastDataTransferCost = Math.max(0, inputs.fastDataTransfer - FAST_DATA_TRANSFER_INCLUDED) * FAST_DATA_TRANSFER_PRICE
+
+    // Fast Origin Transfer - $0.06 per GB after 10GB included (Hobby)
+    const fastOriginTransferCost = Math.max(0, inputs.fastOriginTransfer - FAST_ORIGIN_TRANSFER_INCLUDED) * FAST_ORIGIN_TRANSFER_PRICE
+
+    // Vercel Functions
+    const functionActiveCpuCost = Math.max(0, inputs.functionActiveCpuTime - FUNCTION_ACTIVE_CPU_INCLUDED) * FUNCTION_ACTIVE_CPU_PRICE
+    const functionProvisionedMemoryCost = Math.max(0, inputs.provisionedMemory - FUNCTION_PROVISIONED_MEMORY_INCLUDED) * FUNCTION_PROVISIONED_MEMORY_PRICE
+    const functionInvocationsCost = Math.max(0, inputs.invocations - FUNCTION_INVOCATIONS_INCLUDED) * FUNCTION_INVOCATIONS_PRICE
+
+    // Vercel Sandbox
+    const sandboxActiveCpuCost = Math.max(0, inputs.sandboxActiveCpuTime - SANDBOX_ACTIVE_CPU_INCLUDED) * SANDBOX_ACTIVE_CPU_PRICE
+    const sandboxProvisionedMemoryCost = Math.max(0, inputs.sandboxProvisionedMemory - SANDBOX_PROVISIONED_MEMORY_INCLUDED) * SANDBOX_PROVISIONED_MEMORY_PRICE
+    const sandboxCreationsCost = Math.max(0, inputs.sandboxCreations - SANDBOX_CREATIONS_INCLUDED) * SANDBOX_CREATIONS_PRICE
+    const sandboxNetworkCost = Math.max(0, inputs.sandboxNetwork - SANDBOX_NETWORK_INCLUDED) * SANDBOX_NETWORK_PRICE
+
+    // Vercel Workflow
+    const workflowStepsCost = Math.max(0, inputs.steps - WORKFLOW_STEPS_INCLUDED) * WORKFLOW_STEPS_PRICE
+    const workflowStorageCost = Math.max(0, inputs.storage - WORKFLOW_STORAGE_INCLUDED) * WORKFLOW_STORAGE_PRICE
+
+    // Build Minutes
+    const standardMachineCost = inputs.standardMachines * STANDARD_MACHINE_PRICE
+    const enhancedMachineCost = inputs.enhancedMachines * ENHANCED_MACHINE_PRICE
+    const turboMachineCost = inputs.turboMachines * TURBO_MACHINE_PRICE
+
+    // Image Transformations
+    const imageTransformationsCost = Math.max(0, inputs.imageTransformations - IMAGE_TRANSFORMATIONS_INCLUDED) * IMAGE_TRANSFORMATIONS_PRICE
+
+    // Image Cache Operations
+    const imageCacheReadsCost = Math.max(0, inputs.imageCacheReads - IMAGE_CACHE_READS_INCLUDED) * IMAGE_CACHE_READS_PRICE
+    const imageCacheWritesCost = Math.max(0, inputs.imageCacheWrites - IMAGE_CACHE_WRITES_INCLUDED) * IMAGE_CACHE_WRITES_PRICE
+
+    // Web Analytics
+    const analyticsCost = inputs.webAnalytics * ANALYTICS_EVENTS_PRICE
+
+    // Blob Storage
+    const blobStorageCost = Math.max(0, inputs.blobStorageSize - BLOB_STORAGE_INCLUDED) * BLOB_STORAGE_PRICE
+    const blobSimpleOpsCost = Math.max(0, inputs.blobSimpleOps - BLOB_SIMPLE_OPS_INCLUDED) * BLOB_SIMPLE_OPS_PRICE
+    const blobAdvancedOpsCost = Math.max(0, inputs.blobAdvancedOps - BLOB_ADVANCED_OPS_INCLUDED) * BLOB_ADVANCED_OPS_PRICE
+    const blobDataTransferCost = Math.max(0, inputs.blobDataTransfer - BLOB_DATA_TRANSFER_INCLUDED) * BLOB_DATA_TRANSFER_PRICE
+
+    // Edge Config
+    const edgeConfigReadsCost = Math.max(0, inputs.edgeConfigReads - EDGE_CONFIG_READS_INCLUDED) * EDGE_CONFIG_READS_PRICE
+    const edgeConfigWritesCost = Math.max(0, inputs.edgeConfigWrites - EDGE_CONFIG_WRITES_INCLUDED) * EDGE_CONFIG_WRITES_PRICE
+
+    // ISR (Incremental Static Regeneration)
+    const isrReadsCost = Math.max(0, inputs.isrReads - ISR_READS_INCLUDED) * ISR_READS_PRICE
+    const isrWritesCost = Math.max(0, inputs.isrWrites - ISR_WRITES_INCLUDED) * ISR_WRITES_PRICE
+
+    // Firewall (Rate Limiting)
+    const rateLimitingCost = Math.max(0, inputs.rateLimitingRequests * 1_000_000 - RATE_LIMITING_INCLUDED) * RATE_LIMITING_PRICE
+
+    // BotID (Deep Analysis checks)
+    const botIdCost = (inputs.botId || 0) * BOTID_DEEP_ANALYSIS_PRICE
+
+    const usageTotal =
+        edgeRequestsCost +
+        fastDataTransferCost +
+        fastOriginTransferCost +
+        functionActiveCpuCost +
+        functionProvisionedMemoryCost +
+        functionInvocationsCost +
+        sandboxActiveCpuCost +
+        sandboxProvisionedMemoryCost +
+        sandboxCreationsCost +
+        sandboxNetworkCost +
+        workflowStepsCost +
+        workflowStorageCost +
+        standardMachineCost +
+        enhancedMachineCost +
+        turboMachineCost +
+        imageTransformationsCost +
+        imageCacheReadsCost +
+        imageCacheWritesCost +
+        analyticsCost +
+        blobStorageCost +
+        blobSimpleOpsCost +
+        blobAdvancedOpsCost +
+        blobDataTransferCost +
+        edgeConfigReadsCost +
+        edgeConfigWritesCost +
+        isrReadsCost +
+        isrWritesCost +
+        rateLimitingCost +
+        botIdCost
+
+    const creditsApplied = Math.min(INCLUDED_CREDIT, usageTotal)
+    const finalTotal = BASE_PRICE + Math.max(0, usageTotal - INCLUDED_CREDIT)
+
+    return {
+        basePrice: BASE_PRICE,
+        usageCharges: usageTotal,
+        creditsApplied,
+        total: finalTotal,
+        breakdown: [
+            { label: "Base Subscription", value: BASE_PRICE, category: "Base" },
+            { label: "Edge Requests", value: edgeRequestsCost, category: "Edge Network", included: EDGE_REQUESTS_INCLUDED },
+            { label: "Fast Data Transfer", value: fastDataTransferCost, category: "Edge Network", included: `${FAST_DATA_TRANSFER_INCLUDED} GB` },
+            { label: "Fast Origin Transfer", value: fastOriginTransferCost, category: "Edge Network", included: `${FAST_ORIGIN_TRANSFER_INCLUDED} GB` },
+            { label: "Functions Active CPU", value: functionActiveCpuCost, category: "Compute", included: `${FUNCTION_ACTIVE_CPU_INCLUDED} hrs` },
+            { label: "Functions Memory", value: functionProvisionedMemoryCost, category: "Compute", included: `${FUNCTION_PROVISIONED_MEMORY_INCLUDED} GB-hrs` },
+            { label: "Function Invocations", value: functionInvocationsCost, category: "Compute", included: FUNCTION_INVOCATIONS_INCLUDED },
+            { label: "Sandbox Active CPU", value: sandboxActiveCpuCost, category: "Sandbox", included: `${SANDBOX_ACTIVE_CPU_INCLUDED} hrs` },
+            { label: "Sandbox Memory", value: sandboxProvisionedMemoryCost, category: "Sandbox", included: `${SANDBOX_PROVISIONED_MEMORY_INCLUDED} GB-hrs` },
+            { label: "Sandbox Creations", value: sandboxCreationsCost, category: "Sandbox", included: SANDBOX_CREATIONS_INCLUDED },
+            { label: "Sandbox Network", value: sandboxNetworkCost, category: "Sandbox", included: `${SANDBOX_NETWORK_INCLUDED} GB` },
+            { label: "Workflow Steps", value: workflowStepsCost, category: "Workflow", included: WORKFLOW_STEPS_INCLUDED },
+            { label: "Workflow Storage", value: workflowStorageCost, category: "Workflow", included: `${WORKFLOW_STORAGE_INCLUDED} GB` },
+            { label: "Build Standard Machines", value: standardMachineCost, category: "Build" },
+            { label: "Build Enhanced Machines", value: enhancedMachineCost, category: "Build" },
+            { label: "Build Turbo Machines", value: turboMachineCost, category: "Build" },
+            { label: "Image Transformations", value: imageTransformationsCost, category: "Image Optimization", included: IMAGE_TRANSFORMATIONS_INCLUDED },
+            { label: "Image Cache Reads", value: imageCacheReadsCost, category: "Image Optimization", included: IMAGE_CACHE_READS_INCLUDED },
+            { label: "Image Cache Writes", value: imageCacheWritesCost, category: "Image Optimization", included: IMAGE_CACHE_WRITES_INCLUDED },
+            { label: "Web Analytics", value: analyticsCost, category: "Analytics" },
+            { label: "Blob Storage Size", value: blobStorageCost, category: "Blob Storage", included: `${BLOB_STORAGE_INCLUDED} GB` },
+            { label: "Blob Simple Ops", value: blobSimpleOpsCost, category: "Blob Storage", included: BLOB_SIMPLE_OPS_INCLUDED },
+            { label: "Blob Advanced Ops", value: blobAdvancedOpsCost, category: "Blob Storage", included: BLOB_ADVANCED_OPS_INCLUDED },
+            { label: "Blob Data Transfer", value: blobDataTransferCost, category: "Blob Storage", included: `${BLOB_DATA_TRANSFER_INCLUDED} GB` },
+            { label: "Edge Config Reads", value: edgeConfigReadsCost, category: "Edge Config", included: EDGE_CONFIG_READS_INCLUDED },
+            { label: "Edge Config Writes", value: edgeConfigWritesCost, category: "Edge Config", included: EDGE_CONFIG_WRITES_INCLUDED },
+            { label: "ISR Reads", value: isrReadsCost, category: "ISR", included: ISR_READS_INCLUDED },
+            { label: "ISR Writes", value: isrWritesCost, category: "ISR", included: ISR_WRITES_INCLUDED },
+            { label: "Rate Limiting", value: rateLimitingCost, category: "Firewall", included: RATE_LIMITING_INCLUDED },
+            { label: "BotID Deep Analysis", value: botIdCost, category: "Firewall" },
+            { label: "Credits Applied", value: -creditsApplied, category: "Credits" },
+        ],
+    }
+}
+
+// Cloudflare Workers Paid Pricing (from cloudflare-pricing.html)
+function calculateCloudflareCost(inputs: CloudflareInputs, plan: CloudflarePlan = "paid") {
+    // Base price: $0 for free, $5 for paid/custom
+    const BASE_PRICE = plan === "free" ? 0 : 5
+
+    // Workers
+    const WORKER_REQUESTS_INCLUDED = 10_000_000
+    const WORKER_REQUESTS_PRICE = 0.30 / 1_000_000
+    const CPU_TIME_INCLUDED = 30_000_000 // 30M CPU milliseconds
+    const CPU_TIME_PRICE = 0.02 / 1_000_000 // per million CPU ms
+
+    // KV Storage
+    const KV_READS_INCLUDED = 10_000_000
+    const KV_READS_PRICE = 0.50 / 1_000_000
+    const KV_WRITES_INCLUDED = 1_000_000
+    const KV_WRITES_PRICE = 5.00 / 1_000_000
+    const KV_STORAGE_INCLUDED = 1 // GB
+    const KV_STORAGE_PRICE = 0.50 // per GB/month
+
+    // R2 Storage
+    const R2_STORAGE_INCLUDED = 10 // GB
+    const R2_STORAGE_PRICE = 0.015 // per GB/month
+    const R2_CLASS_A_INCLUDED = 1_000_000
+    const R2_CLASS_A_PRICE = 4.50 / 1_000_000
+    const R2_CLASS_B_INCLUDED = 10_000_000
+    const R2_CLASS_B_PRICE = 0.36 / 1_000_000
+
+    // D1 Database
+    const D1_ROWS_READ_INCLUDED = 25_000_000_000 // 25 billion per month
+    const D1_ROWS_READ_PRICE = 0.001 / 1_000_000
+    const D1_ROWS_WRITTEN_INCLUDED = 50_000_000
+    const D1_ROWS_WRITTEN_PRICE = 1.00 / 1_000_000
+    const D1_STORAGE_INCLUDED = 5 // GB
+    const D1_STORAGE_PRICE = 0.75 // per GB/month
+
+    // Images
+    const IMAGES_TRANSFORMS_INCLUDED = 5_000
+    const IMAGES_TRANSFORMS_PRICE = 0.50 / 1_000
+    const IMAGES_STORED_PRICE = 5 / 100_000 // per 100k images/month
+    const IMAGES_DELIVERED_PRICE = 1 / 100_000 // per 100k delivered/month
+
+    // Workers
+    const workerRequestsCost = Math.max(0, inputs.workerRequests - WORKER_REQUESTS_INCLUDED) * WORKER_REQUESTS_PRICE
+    const cpuTimeCost = Math.max(0, inputs.cpuTimeMs - CPU_TIME_INCLUDED) * CPU_TIME_PRICE
+
+    // KV
+    const kvReadsCost = Math.max(0, inputs.kvReads - KV_READS_INCLUDED) * KV_READS_PRICE
+    const kvWritesCost = Math.max(0, inputs.kvWrites - KV_WRITES_INCLUDED) * KV_WRITES_PRICE
+    const kvStorageCost = Math.max(0, inputs.kvStorageGb - KV_STORAGE_INCLUDED) * KV_STORAGE_PRICE
+
+    // R2
+    const r2StorageCost = Math.max(0, inputs.r2StorageGb - R2_STORAGE_INCLUDED) * R2_STORAGE_PRICE
+    const r2ClassACost = Math.max(0, inputs.r2ClassAOps - R2_CLASS_A_INCLUDED) * R2_CLASS_A_PRICE
+    const r2ClassBCost = Math.max(0, inputs.r2ClassBOps - R2_CLASS_B_INCLUDED) * R2_CLASS_B_PRICE
+
+    // D1
+    const d1RowsReadCost = Math.max(0, inputs.d1RowsRead - D1_ROWS_READ_INCLUDED) * D1_ROWS_READ_PRICE
+    const d1RowsWrittenCost = Math.max(0, inputs.d1RowsWritten - D1_ROWS_WRITTEN_INCLUDED) * D1_ROWS_WRITTEN_PRICE
+    const d1StorageCost = Math.max(0, inputs.d1StorageGb - D1_STORAGE_INCLUDED) * D1_STORAGE_PRICE
+
+    // Images
+    const imageTransformsCost = Math.max(0, inputs.imageTransformations - IMAGES_TRANSFORMS_INCLUDED) * IMAGES_TRANSFORMS_PRICE
+    const imagesStoredCost = inputs.imagesStored * IMAGES_STORED_PRICE
+    const imagesDeliveredCost = inputs.imagesDelivered * IMAGES_DELIVERED_PRICE
+
+    const usageTotal =
+        workerRequestsCost +
+        cpuTimeCost +
+        kvReadsCost +
+        kvWritesCost +
+        kvStorageCost +
+        r2StorageCost +
+        r2ClassACost +
+        r2ClassBCost +
+        d1RowsReadCost +
+        d1RowsWrittenCost +
+        d1StorageCost +
+        imageTransformsCost +
+        imagesStoredCost +
+        imagesDeliveredCost
+
+    const finalTotal = BASE_PRICE + usageTotal
+
+    return {
+        basePrice: BASE_PRICE,
+        usageCharges: usageTotal,
+        creditsApplied: 0,
+        total: finalTotal,
+        breakdown: [
+            { label: "Base Subscription", value: BASE_PRICE, category: "Base" },
+            { label: "Worker Requests", value: workerRequestsCost, category: "Workers", included: WORKER_REQUESTS_INCLUDED },
+            { label: "CPU Time", value: cpuTimeCost, category: "Workers", included: `${CPU_TIME_INCLUDED / 1_000_000}M ms` },
+            { label: "KV Reads", value: kvReadsCost, category: "KV Storage", included: KV_READS_INCLUDED },
+            { label: "KV Writes", value: kvWritesCost, category: "KV Storage", included: KV_WRITES_INCLUDED },
+            { label: "KV Storage", value: kvStorageCost, category: "KV Storage", included: `${KV_STORAGE_INCLUDED} GB` },
+            { label: "R2 Storage", value: r2StorageCost, category: "R2", included: `${R2_STORAGE_INCLUDED} GB` },
+            { label: "R2 Class A Ops", value: r2ClassACost, category: "R2", included: R2_CLASS_A_INCLUDED },
+            { label: "R2 Class B Ops", value: r2ClassBCost, category: "R2", included: R2_CLASS_B_INCLUDED },
+            { label: "D1 Rows Read", value: d1RowsReadCost, category: "D1", included: `${D1_ROWS_READ_INCLUDED / 1_000_000_000}B` },
+            { label: "D1 Rows Written", value: d1RowsWrittenCost, category: "D1", included: `${D1_ROWS_WRITTEN_INCLUDED / 1_000_000}M` },
+            { label: "D1 Storage", value: d1StorageCost, category: "D1", included: `${D1_STORAGE_INCLUDED} GB` },
+            { label: "Image Transforms", value: imageTransformsCost, category: "Images", included: IMAGES_TRANSFORMS_INCLUDED },
+            { label: "Images Stored", value: imagesStoredCost, category: "Images" },
+            { label: "Images Delivered", value: imagesDeliveredCost, category: "Images" },
+        ],
+    }
+}
+
+// Cookie storage keys
+const COOKIE_KEYS = {
+    PROVIDER: 'hosting-calc-provider',
+    VERCEL_TEAM: 'hosting-calc-vercel-team',
+    VERCEL_INPUTS: 'hosting-calc-vercel-inputs',
+    CLOUDFLARE_INPUTS: 'hosting-calc-cloudflare-inputs',
+}
+
+// Cookie utilities
+function setCookie(name: string, value: string, days = 365) {
+    const expires = new Date()
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000)
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`
+}
+
+function getCookie(name: string): string | null {
+    const nameEQ = name + "="
+    const ca = document.cookie.split(';')
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i]
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length)
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length)
+    }
+    return null
+}
+
+const defaultCloudflareInputs: CloudflareInputs = {
+    workerRequests: 0,
+    cpuTimeMs: 0,
+    kvReads: 0,
+    kvWrites: 0,
+    kvStorageGb: 0,
+    r2StorageGb: 0,
+    r2ClassAOps: 0,
+    r2ClassBOps: 0,
+    d1RowsRead: 0,
+    d1RowsWritten: 0,
+    d1StorageGb: 0,
+    imageTransformations: 0,
+    imagesStored: 0,
+    imagesDelivered: 0,
+}
+
+const vercelHobbyInputs: VercelInputs = {
+    // Edge Network (Hobby limits)
+    edgeRequests: 1_000_000, // 1M/month included
+    fastDataTransfer: 100, // 100 GB/month included
+    fastOriginTransfer: 10, // 10 GB/month included
+
+    // Firewall (Hobby limits)
+    rateLimitingRequests: 1, // 1M allowed requests/month included
+    botId: undefined, // Basic checks included (free)
+
+    // ISR (Hobby limits)
+    isrReads: 1_000_000, // 1M/month included
+    isrWrites: 200_000, // 200K/month included
+
+    // Blob Storage (Hobby limits)
+    blobStorageSize: 1, // 1 GB included
+    blobSimpleOps: 10_000, // 10K/month included
+    blobAdvancedOps: 2_000, // 2K/month included
+    blobDataTransfer: 10, // 10 GB/month included
+
+    // Image Optimization (Hobby limits)
+    imageCacheReads: 300_000, // 300K/month included
+    imageCacheWrites: 100_000, // 100K/month included
+    imageTransformations: 5_000, // 5K/month included
+
+    // Edge Config (Hobby limits)
+    edgeConfigReads: 100_000, // 100K/month included
+    edgeConfigWrites: 100, // 100/month included
+
+    // Vercel Functions (Hobby limits)
+    functionActiveCpuTime: 4, // 4 hours/month included
+    provisionedMemory: 360, // 360 GB-hrs/month included
+    invocations: 1_000_000, // 1M/month included
+
+    // Vercel Sandbox (Hobby limits)
+    sandboxActiveCpuTime: 5, // 5 hours/month included
+    sandboxProvisionedMemory: 420, // 420 GB-hrs/month included
+    sandboxInvocations: 0, // Not specified in pricing
+    sandboxCreations: 5_000, // 5K/month included
+    sandboxNetwork: 20, // 20 GB/month included
+
+    // Vercel Workflow (Hobby limits)
+    steps: 50_000, // 50K steps/month included
+    storage: 1, // 1 GB/month included
+
+    // Build Minutes (Hobby has no included, all paid)
+    standardMachines: 0,
+    enhancedMachines: 0,
+    turboMachines: 0,
+
+    // Observability
+    webAnalytics: 0, // Usage-based pricing
+}
+
+const vercelProInputs: VercelInputs = {
+    // Edge Network (Pro plan includes)
+    edgeRequests: 10_000_000, // 10M/month included
+    fastDataTransfer: 1_000, // 1TB/month included
+    fastOriginTransfer: 10, // Same as Hobby: 10 GB/month included
+
+    // Firewall (Pro plan)
+    rateLimitingRequests: 1, // Same as Hobby: 1M/month included (then pay per 1M)
+    botId: undefined, // Basic checks included
+
+    // ISR (Pro plan - same as Hobby)
+    isrReads: 1_000_000, // 1M/month included
+    isrWrites: 200_000, // 200K/month included
+
+    // Blob Storage (Pro plan - same as Hobby)
+    blobStorageSize: 1, // 1 GB included
+    blobSimpleOps: 10_000, // 10K/month included
+    blobAdvancedOps: 2_000, // 2K/month included
+    blobDataTransfer: 10, // 10 GB/month included
+
+    // Image Optimization (Pro plan - same as Hobby)
+    imageCacheReads: 300_000, // 300K/month included
+    imageCacheWrites: 100_000, // 100K/month included
+    imageTransformations: 5_000, // 5K/month included
+
+    // Edge Config (Pro plan - same as Hobby)
+    edgeConfigReads: 100_000, // 100K/month included
+    edgeConfigWrites: 100, // 100/month included
+
+    // Vercel Functions (Pro plan - same as Hobby)
+    functionActiveCpuTime: 4, // 4 hours/month included
+    provisionedMemory: 360, // 360 GB-hrs/month included
+    invocations: 1_000_000, // 1M/month included
+
+    // Vercel Sandbox (Pro plan - same as Hobby)
+    sandboxActiveCpuTime: 5, // 5 hours/month included
+    sandboxProvisionedMemory: 420, // 420 GB-hrs/month included
+    sandboxInvocations: 0, // Not specified in pricing
+    sandboxCreations: 5_000, // 5K/month included
+    sandboxNetwork: 20, // 20 GB/month included
+
+    // Vercel Workflow (Pro plan - same as Hobby)
+    steps: 50_000, // 50K steps/month included
+    storage: 1, // 1 GB/month included
+
+    // Build Minutes (Pro plan - pay per minute)
+    standardMachines: 0, // Pay per minute
+    enhancedMachines: 0, // Pay per minute
+    turboMachines: 0, // Pay per minute
+
+    // Observability
+    webAnalytics: 0, // Usage-based pricing
+}
+
+// Cloudflare Workers Free Plan Limits (max free tier usage)
+const workersFreePlanInputs: CloudflareInputs = {
+    workerRequests: 100_000, // 100k/day = ~3M/month, but conservative at 100k
+    cpuTimeMs: 10_000, // 10ms per invocation limit
+    kvReads: 100_000,
+    kvWrites: 1_000,
+    kvStorageGb: 1,
+    r2StorageGb: 10,
+    r2ClassAOps: 1_000_000,
+    r2ClassBOps: 10_000_000,
+    d1RowsRead: 5_000_000,
+    d1RowsWritten: 100_000,
+    d1StorageGb: 5,
+    imageTransformations: 0, // Not available on free
+    imagesStored: 0,
+    imagesDelivered: 0,
+}
+
+// Cloudflare Workers Paid Plan Base (included in $5/month)
+const workersPaidPlanInputs: CloudflareInputs = {
+    workerRequests: 10_000_000, // 10M included
+    cpuTimeMs: 30_000_000, // 30M CPU ms included
+    kvReads: 10_000_000, // 10M included
+    kvWrites: 1_000_000, // 1M included
+    kvStorageGb: 1, // 1GB included
+    r2StorageGb: 10, // 10GB included
+    r2ClassAOps: 1_000_000, // 1M included
+    r2ClassBOps: 10_000_000, // 10M included
+    d1RowsRead: 25_000_000_000, // 25B included
+    d1RowsWritten: 50_000_000, // 50M included
+    d1StorageGb: 5, // 5GB included
+    imageTransformations: 5_000, // 5k included
+    imagesStored: 100_000, // 100k included (estimated base)
+    imagesDelivered: 100_000, // 100k included (estimated base)
+}
+
+// R2 Free Plan
+const r2FreePlanLimits = {
+    r2StorageGb: 10, // 10GB free
+    r2ClassAOps: 1_000_000, // 1M free
+    r2ClassBOps: 10_000_000, // 10M free
+}
+
+// R2 Paid Plan (same as free included)
+const r2PaidPlanLimits = {
+    r2StorageGb: 10,
+    r2ClassAOps: 1_000_000,
+    r2ClassBOps: 10_000_000,
+}
+
+// D1 Free Plan (daily limits)
+const d1FreePlanLimits = {
+    d1RowsRead: 5_000_000, // 5M per day
+    d1RowsWritten: 100_000, // 100k per day
+    d1StorageGb: 5, // 5GB total
+}
+
+// D1 Paid Plan
+const d1PaidPlanLimits = {
+    d1RowsRead: 25_000_000_000, // 25B included
+    d1RowsWritten: 50_000_000, // 50M included
+    d1StorageGb: 5, // 5GB included
+}
+
+// Images Free Plan
+const imagesFreePlanLimits = {
+    imageTransformations: 5_000, // 5k free
+    imagesStored: 0, // Not available on free
+    imagesDelivered: 0, // Not available on free
+}
+
+// Images Paid Plan
+const imagesPaidPlanLimits = {
+    imageTransformations: 5_000, // 5k included
+    imagesStored: 100_000, // Base estimate
+    imagesDelivered: 100_000, // Base estimate
+}
+
+export default function HostingCalculatorPage() {
+    const [provider, setProvider] = React.useState<Provider>("vercel")
+    const [vercelTeamMembers, setVercelTeamMembers] = React.useState(1)
+    const [vercelInputs, setVercelInputs] = React.useState<VercelInputs>(vercelHobbyInputs)
+    const [cloudflareInputs, setCloudflareInputs] = React.useState<CloudflareInputs>(defaultCloudflareInputs)
+
+    // Plan state tracking
+    const [vercelPlan, setVercelPlan] = React.useState<VercelPlan>("hobby")
+    const [cloudflareService, setCloudflareService] = React.useState<CloudflareService>("workers")
+    const [workersKvPlan, setWorkersKvPlan] = React.useState<CloudflarePlan>("free")
+    const [imagesPlan, setImagesPlan] = React.useState<CloudflarePlan>("free")
+
+    // Refs to prevent auto-detection from overriding manual selections
+    const manualPlanChangeRef = React.useRef(false)
+
+    // For backward compatibility - use workers plan for overall calculation
+    const cloudflarePlan = workersKvPlan
+
+    // Load from cookies on mount
+    React.useEffect(() => {
+        const savedProvider = getCookie(COOKIE_KEYS.PROVIDER)
+        if (savedProvider) setProvider(savedProvider as Provider)
+
+        const savedTeam = getCookie(COOKIE_KEYS.VERCEL_TEAM)
+        if (savedTeam) setVercelTeamMembers(parseInt(savedTeam))
+
+        const savedVercel = getCookie(COOKIE_KEYS.VERCEL_INPUTS)
+        if (savedVercel) {
+            try {
+                setVercelInputs(JSON.parse(savedVercel))
+            } catch (e) {
+                console.error('Failed to parse Vercel inputs from cookie')
+            }
+        }
+
+        const savedCloudflare = getCookie(COOKIE_KEYS.CLOUDFLARE_INPUTS)
+        if (savedCloudflare) {
+            try {
+                setCloudflareInputs(JSON.parse(savedCloudflare))
+            } catch (e) {
+                console.error('Failed to parse Cloudflare inputs from cookie')
+            }
+        }
+    }, [])
+
+    // Save to cookies on change
+    React.useEffect(() => {
+        setCookie(COOKIE_KEYS.PROVIDER, provider)
+    }, [provider])
+
+    React.useEffect(() => {
+        setCookie(COOKIE_KEYS.VERCEL_TEAM, vercelTeamMembers.toString())
+    }, [vercelTeamMembers])
+
+    React.useEffect(() => {
+        setCookie(COOKIE_KEYS.VERCEL_INPUTS, JSON.stringify(vercelInputs))
+    }, [vercelInputs])
+
+    React.useEffect(() => {
+        setCookie(COOKIE_KEYS.CLOUDFLARE_INPUTS, JSON.stringify(cloudflareInputs))
+    }, [cloudflareInputs])
+
+
+
+    // Reset functions
+    const resetVercelInputs = () => {
+        setVercelInputs(vercelHobbyInputs)
+        setVercelTeamMembers(1)
+        setVercelPlan("hobby")
+    }
+
+    const setVercelHobbyPlan = () => {
+        setVercelInputs(prev => ({
+            ...prev,
+            ...vercelHobbyInputs,
+        }))
+        setVercelPlan("hobby")
+    }
+
+    const setVercelProPlan = () => {
+        setVercelInputs(prev => ({
+            ...prev,
+            ...vercelProInputs,
+        }))
+        setVercelPlan("pro")
+    }
+
+
+    const resetCloudflareInputs = () => {
+        setCloudflareInputs(defaultCloudflareInputs)
+        setWorkersKvPlan("free")
+        setImagesPlan("free")
+    }
+
+    // Plan preset handlers for each service
+    // Workers + KV
+    const setWorkersFreePlan = () => {
+        manualPlanChangeRef.current = true
+        setCloudflareInputs(prev => ({
+            ...prev,
+            workerRequests: workersFreePlanInputs.workerRequests,
+            cpuTimeMs: workersFreePlanInputs.cpuTimeMs,
+            kvReads: workersFreePlanInputs.kvReads,
+            kvWrites: workersFreePlanInputs.kvWrites,
+            kvStorageGb: workersFreePlanInputs.kvStorageGb,
+            d1RowsRead: d1FreePlanLimits.d1RowsRead,
+            d1RowsWritten: d1FreePlanLimits.d1RowsWritten,
+            d1StorageGb: d1FreePlanLimits.d1StorageGb,
+        }))
+        setWorkersKvPlan("free")
+        // Reset the flag after a short delay to allow auto-detection to resume
+        setTimeout(() => {
+            manualPlanChangeRef.current = false
+        }, 100)
+    }
+
+    const setWorkersPaidPlan = () => {
+        manualPlanChangeRef.current = true
+        setCloudflareInputs(prev => ({
+            ...prev,
+            workerRequests: workersPaidPlanInputs.workerRequests,
+            cpuTimeMs: workersPaidPlanInputs.cpuTimeMs,
+            kvReads: workersPaidPlanInputs.kvReads,
+            kvWrites: workersPaidPlanInputs.kvWrites,
+            kvStorageGb: workersPaidPlanInputs.kvStorageGb,
+            d1RowsRead: workersPaidPlanInputs.d1RowsRead,
+            d1RowsWritten: workersPaidPlanInputs.d1RowsWritten,
+            d1StorageGb: workersPaidPlanInputs.d1StorageGb,
+        }))
+        setWorkersKvPlan("paid")
+        setTimeout(() => {
+            manualPlanChangeRef.current = false
+        }, 100)
+    }
+
+    // D1
+    const setD1FreePlan = () => {
+        setCloudflareInputs(prev => ({
+            ...prev,
+            ...d1FreePlanLimits,
+        }))
+        setWorkersKvPlan("free")
+    }
+
+    const setD1PaidPlan = () => {
+        setCloudflareInputs(prev => ({
+            ...prev,
+            ...d1PaidPlanLimits,
+        }))
+        setWorkersKvPlan("paid")
+    }
+
+    // Images
+    const setImagesFreePlan = () => {
+        setCloudflareInputs(prev => ({
+            ...prev,
+            ...imagesFreePlanLimits,
+        }))
+        setImagesPlan("free")
+    }
+
+    const setImagesPaidPlan = () => {
+        setCloudflareInputs(prev => ({
+            ...prev,
+            ...imagesPaidPlanLimits,
+        }))
+        setImagesPlan("paid")
+    }
+
+    // Auto-detect Vercel plan based on inputs
+    React.useEffect(() => {
+        // Check if inputs exceed Pro plan limits
+        const exceedsPro =
+            vercelInputs.edgeRequests > vercelProInputs.edgeRequests ||
+            vercelInputs.fastDataTransfer > vercelProInputs.fastDataTransfer ||
+            vercelInputs.functionActiveCpuTime > vercelProInputs.functionActiveCpuTime ||
+            vercelInputs.provisionedMemory > vercelProInputs.provisionedMemory ||
+            vercelInputs.invocations > vercelProInputs.invocations ||
+            vercelInputs.imageTransformations > vercelProInputs.imageTransformations ||
+            vercelInputs.imageCacheReads > vercelProInputs.imageCacheReads ||
+            vercelInputs.imageCacheWrites > vercelProInputs.imageCacheWrites ||
+            vercelInputs.blobStorageSize > vercelProInputs.blobStorageSize ||
+            vercelInputs.blobSimpleOps > vercelProInputs.blobSimpleOps ||
+            vercelInputs.blobAdvancedOps > vercelProInputs.blobAdvancedOps ||
+            vercelInputs.blobDataTransfer > vercelProInputs.blobDataTransfer ||
+            vercelInputs.edgeConfigReads > vercelProInputs.edgeConfigReads ||
+            vercelInputs.edgeConfigWrites > vercelProInputs.edgeConfigWrites ||
+            vercelInputs.isrReads > vercelProInputs.isrReads ||
+            vercelInputs.isrWrites > vercelProInputs.isrWrites ||
+            vercelTeamMembers > 1 ||
+            vercelInputs.standardMachines > 0 ||
+            vercelInputs.enhancedMachines > 0 ||
+            vercelInputs.turboMachines > 0
+
+        // Check if inputs exceed Hobby plan limits
+        const exceedsHobby =
+            vercelInputs.edgeRequests > vercelHobbyInputs.edgeRequests ||
+            vercelInputs.fastDataTransfer > vercelHobbyInputs.fastDataTransfer ||
+            vercelInputs.functionActiveCpuTime > vercelHobbyInputs.functionActiveCpuTime ||
+            vercelInputs.provisionedMemory > vercelHobbyInputs.provisionedMemory ||
+            vercelInputs.invocations > vercelHobbyInputs.invocations ||
+            vercelInputs.imageTransformations > vercelHobbyInputs.imageTransformations ||
+            vercelInputs.imageCacheReads > vercelHobbyInputs.imageCacheReads ||
+            vercelInputs.imageCacheWrites > vercelHobbyInputs.imageCacheWrites ||
+            vercelInputs.blobStorageSize > vercelHobbyInputs.blobStorageSize ||
+            vercelInputs.blobSimpleOps > vercelHobbyInputs.blobSimpleOps ||
+            vercelInputs.blobAdvancedOps > vercelHobbyInputs.blobAdvancedOps ||
+            vercelInputs.blobDataTransfer > vercelHobbyInputs.blobDataTransfer ||
+            vercelInputs.edgeConfigReads > vercelHobbyInputs.edgeConfigReads ||
+            vercelInputs.edgeConfigWrites > vercelHobbyInputs.edgeConfigWrites ||
+            vercelInputs.isrReads > vercelHobbyInputs.isrReads ||
+            vercelInputs.isrWrites > vercelHobbyInputs.isrWrites ||
+            vercelTeamMembers > 1 ||
+            vercelInputs.standardMachines > 0 ||
+            vercelInputs.enhancedMachines > 0 ||
+            vercelInputs.turboMachines > 0
+
+        setVercelPlan(exceedsPro ? "enterprise" : exceedsHobby ? "pro" : "hobby")
+    }, [vercelInputs, vercelTeamMembers])
+
+    // Auto-detect plans for each service
+    React.useEffect(() => {
+        // Skip auto-detection if a manual plan change was just made
+        if (manualPlanChangeRef.current) {
+            return
+        }
+
+        // Workers + KV + D1 detection
+        const workersExceedsPaid =
+            cloudflareInputs.workerRequests > workersPaidPlanInputs.workerRequests ||
+            cloudflareInputs.cpuTimeMs > workersPaidPlanInputs.cpuTimeMs ||
+            cloudflareInputs.kvReads > workersPaidPlanInputs.kvReads ||
+            cloudflareInputs.kvWrites > workersPaidPlanInputs.kvWrites ||
+            cloudflareInputs.kvStorageGb > workersPaidPlanInputs.kvStorageGb ||
+            cloudflareInputs.d1RowsRead > d1PaidPlanLimits.d1RowsRead ||
+            cloudflareInputs.d1RowsWritten > d1PaidPlanLimits.d1RowsWritten ||
+            cloudflareInputs.d1StorageGb > d1PaidPlanLimits.d1StorageGb
+
+        const workersExceedsFree =
+            cloudflareInputs.workerRequests > workersFreePlanInputs.workerRequests ||
+            cloudflareInputs.cpuTimeMs > workersFreePlanInputs.cpuTimeMs ||
+            cloudflareInputs.kvReads > workersFreePlanInputs.kvReads ||
+            cloudflareInputs.kvWrites > workersFreePlanInputs.kvWrites ||
+            cloudflareInputs.kvStorageGb > workersFreePlanInputs.kvStorageGb ||
+            cloudflareInputs.d1RowsRead > d1FreePlanLimits.d1RowsRead ||
+            cloudflareInputs.d1RowsWritten > d1FreePlanLimits.d1RowsWritten ||
+            cloudflareInputs.d1StorageGb > d1FreePlanLimits.d1StorageGb
+
+        setWorkersKvPlan(workersExceedsPaid ? "custom" : workersExceedsFree ? "paid" : "free")
+
+        // Images detection
+        const imagesExceedsPaid =
+            cloudflareInputs.imageTransformations > imagesPaidPlanLimits.imageTransformations ||
+            cloudflareInputs.imagesStored > imagesPaidPlanLimits.imagesStored ||
+            cloudflareInputs.imagesDelivered > imagesPaidPlanLimits.imagesDelivered
+
+        const imagesExceedsFree =
+            cloudflareInputs.imageTransformations > imagesFreePlanLimits.imageTransformations ||
+            cloudflareInputs.imagesStored > 0 || // Storage not available on free
+            cloudflareInputs.imagesDelivered > 0 // Delivery not available on free
+
+        setImagesPlan(imagesExceedsPaid ? "custom" : imagesExceedsFree ? "paid" : "free")
+    }, [cloudflareInputs])
+
+    const vercelCost = calculateVercelCost(vercelInputs, vercelTeamMembers, vercelPlan)
+    const cloudflareCost = calculateCloudflareCost(cloudflareInputs, workersKvPlan)
+
+    const currentCost = provider === "vercel" ? vercelCost : cloudflareCost
+
+    return (
+        <>
+            <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-4 pb-16 pt-10 md:gap-10 md:px-8">
+                <PageTitle
+                    eyebrow="Hosting Cost Calculator"
+                    title="Compare Vercel vs Cloudflare Pricing"
+                    description="Interactive calculator based on official pricing documentation. Adjust usage parameters to estimate your monthly hosting costs with accurate pricing models."
+                    iconSlot={<Calculator className="h-10 w-10" />}
+                />
+
+                <Tabs value={provider} onValueChange={(v) => setProvider(v as Provider)} className="w-full">
+                    <TabsList className="w-full justify-start sticky top-0 z-10 my-10 ">
+                        <TabsTrigger value="vercel" className="gap-2">
+                            <SiNextdotjs className="h-4 w-4" />
+                            Vercel
+                        </TabsTrigger>
+                        <TabsTrigger value="cloudflare" className="gap-2">
+                            <SiCloudflare className="h-4 w-4" />
+                            Cloudflare
+                        </TabsTrigger>
+                    </TabsList>
+
+
+                    <TabsContent value="vercel" className="mt-6 space-y-6">
+                        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+                            {/* Vercel Inputs */}
+                            <div className="space-y-6">
+                                {/* Reset Button */}
+                                <div className="flex items-center justify-between">
+
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={setVercelHobbyPlan}
+                                            className={cn(
+                                                "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition",
+                                                vercelPlan === "hobby"
+                                                    ? "border-primary bg-primary/10 text-primary"
+                                                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:bg-primary/5"
+                                            )}
+                                        >
+                                            Vercel Hobby
+                                        </button>
+                                        <button
+                                            onClick={setVercelProPlan}
+                                            className={cn(
+                                                "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition",
+                                                vercelPlan === "pro"
+                                                    ? "border-primary bg-primary/10 text-primary"
+                                                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:bg-primary/5"
+                                            )}
+                                        >
+                                            Vercel Pro
+                                        </button>
+                                        <button
+                                            className={cn(
+                                                "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition cursor-default",
+                                                vercelPlan === "enterprise"
+                                                    ? "border-primary bg-primary/10 text-primary"
+                                                    : "border-border bg-card text-muted-foreground/60"
+                                            )}
+                                        >
+                                            Enterprise
+                                        </button>
+                                    </div>
+
+                                    <button
+                                        onClick={resetVercelInputs}
+                                        className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition hover:border-primary hover:bg-primary/5 hover:text-primary"
+                                    >
+                                        <RotateCcw className="h-4 w-4" />
+                                        Reset All Values
+                                    </button>
+                                </div>
+
+                                {/* Team Size */}
+                                <div className="rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-card p-6 space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <SiNextdotjs className="h-5 w-5 text-primary" />
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-semibold">Team Configuration</h3>
+                                            <p className="text-xs text-muted-foreground">Pro plan: $20/user/month + $20 credit/user</p>
+                                        </div>
+                                    </div>
+                                    <InputSlider
+                                        label="Team Members (Full Access)"
+                                        value={vercelTeamMembers}
+                                        onValueChange={setVercelTeamMembers}
+                                        min={1}
+                                        max={20}
+                                        step={1}
+                                        unit="users"
+                                        icon={<SiNextdotjs className="h-4 w-4" />}
+                                    />
+                                    <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3 text-sm">
+                                        <span className="text-muted-foreground">Monthly Subscription</span>
+                                        <span className="font-semibold">${(vercelTeamMembers * 20).toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-xl bg-emerald-500/10 p-3 text-sm">
+                                        <span className="text-emerald-600 dark:text-emerald-400">Total Usage Credits</span>
+                                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">${(vercelTeamMembers * 20).toFixed(2)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Edge Network */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <Zap className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Edge Network & CDN</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Edge Requests"
+                                            value={vercelInputs.edgeRequests}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, edgeRequests: v }))}
+                                            min={1_000_000}
+                                            max={100_000_000}
+                                            step={1_000_000}
+                                            unit="requests/mo"
+                                            icon={<Activity className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> $2 per 1M requests after 10M included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of HTTP requests served from Vercel's global CDN/edge network to clients.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Static pages (SSG), cached API routes, ISR pages, SSR requests, Edge Functions, and any request served through Vercel's CDN. Fresh API requests count if configured with Edge Runtime instead of Node.js runtime.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Fast Data Transfer (CDN → Users)"
+                                            value={vercelInputs.fastDataTransfer}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, fastDataTransfer: v }))}
+                                            min={0}
+                                            max={5000}
+                                            step={50}
+                                            unit="GB"
+                                            icon={<TrendingUp className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Total bandwidth transferred from Vercel's CDN to end users (egress traffic).</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> HTML pages, JavaScript bundles, CSS files, images, API responses, and any asset served from your deployment. Increases with page size × visitor count.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Fast Origin Transfer"
+                                            value={vercelInputs.fastOriginTransfer}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, fastOriginTransfer: v }))}
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            unit="GB"
+                                            icon={<HardDrive className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Bandwidth transferred from your origin server/external APIs to Vercel's infrastructure.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> ISR revalidations fetching from CMS/database, Server-Side Rendering calling external APIs, Serverless Functions fetching from third-party services.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Compute */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <SiNextdotjs className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Vercel Functions (Fluid Compute)</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Functions Active CPU Time"
+                                            value={vercelInputs.functionActiveCpuTime}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, functionActiveCpuTime: v }))}
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            unit="hours"
+                                            icon={<Activity className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.128 per hour after 4 hours included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Total CPU execution time consumed by your serverless functions.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> API Routes, Server-Side Rendering (SSR), Server Actions, Middleware, Background Jobs, and any compute-intensive operations in Serverless/Edge Functions.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Provisioned Memory"
+                                            value={vercelInputs.provisionedMemory}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, provisionedMemory: v }))}
+                                            min={0}
+                                            max={2000}
+                                            step={10}
+                                            unit="GB-hrs"
+                                            icon={<Database className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.0106 per GB-hour after 360 GB-hrs included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Amount of RAM allocated to functions × execution duration (GB-hours).</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> All Serverless Functions. Higher memory needed for: image processing, PDF generation, large data transformations, ML inference, or concurrent operations.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Function Invocations"
+                                            value={vercelInputs.invocations}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, invocations: v }))}
+                                            min={0}
+                                            max={100_000_000}
+                                            step={1_000_000}
+                                            unit="invocations"
+                                            icon={<Activity className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.60 per 1M invocations after 1M included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of times your serverless functions are invoked/executed.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Every API request, Server Action call, Middleware execution, or background job trigger. Each function execution counts as one invocation.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Build & Analytics */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <GitBranch className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Build & Analytics</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Build Minutes (Standard Machines)"
+                                            value={vercelInputs.standardMachines}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, standardMachines: v }))}
+                                            min={0}
+                                            max={10000}
+                                            step={10}
+                                            unit="minutes"
+                                            icon={<GitBranch className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.014 per minute</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Build time on standard build machines.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Build Minutes (Enhanced Machines)"
+                                            value={vercelInputs.enhancedMachines}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, enhancedMachines: v }))}
+                                            min={0}
+                                            max={10000}
+                                            step={10}
+                                            unit="minutes"
+                                            icon={<GitBranch className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.028 per minute</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Build time on enhanced build machines with more resources.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Build Minutes (Turbo Machines)"
+                                            value={vercelInputs.turboMachines}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, turboMachines: v }))}
+                                            min={0}
+                                            max={10000}
+                                            step={10}
+                                            unit="minutes"
+                                            icon={<GitBranch className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.126 per minute</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Build time on turbo build machines with maximum resources.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Web Analytics Events"
+                                            value={vercelInputs.webAnalytics}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, webAnalytics: v }))}
+                                            min={0}
+                                            max={1_000_000}
+                                            step={10_000}
+                                            unit="events"
+                                            icon={<Activity className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> $3 per 100k events</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of user interactions tracked by Vercel Analytics (privacy-friendly, no cookies).</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Page views, clicks, custom events. Provides Core Web Vitals, audience insights, and real-user monitoring without GDPR concerns.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Image Optimization */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <ImageIcon className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Image Optimization</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Image Cache Reads"
+                                            value={vercelInputs.imageCacheReads}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, imageCacheReads: v }))}
+                                            min={0}
+                                            max={10_000_000}
+                                            step={100_000}
+                                            unit="reads"
+                                            icon={<ImageIcon className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of times cached/optimized images are served to users.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Next.js Image component serving already-optimized images from cache. Occurs on repeat visits, cached pages, or when images are already transformed.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Image Cache Writes"
+                                            value={vercelInputs.imageCacheWrites}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, imageCacheWrites: v }))}
+                                            min={0}
+                                            max={1_000_000}
+                                            step={10_000}
+                                            unit="writes"
+                                            icon={<ImageIcon className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of new image transformations/optimizations performed and stored in cache.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> First-time image requests requiring: format conversion (WebP/AVIF), resizing, quality adjustment, or responsive variant generation through next/image.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Image Transformations (Unique)"
+                                            value={vercelInputs.imageTransformations}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, imageTransformations: v }))}
+                                            min={0}
+                                            max={100_000}
+                                            step={1_000}
+                                            unit="transforms"
+                                            icon={<ImageIcon className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.05 per 1K transformations after 5K included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of unique image transformations/variants created per month.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Resizing, format conversion (WebP/AVIF), quality adjustments, cropping operations. Each unique combination (size + format + quality) counts once.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Blob Storage */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <Database className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Blob Storage</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Blob Storage Size"
+                                            value={vercelInputs.blobStorageSize}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, blobStorageSize: v }))}
+                                            min={0}
+                                            max={1000}
+                                            step={10}
+                                            unit="GB"
+                                            icon={<HardDrive className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Total storage space occupied by files in Vercel Blob (S3-compatible object storage).</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> User-uploaded images/documents, generated PDFs/reports, video files, backups, or any binary data stored via @vercel/blob SDK.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Blob Simple Operations"
+                                            value={vercelInputs.blobSimpleOps}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, blobSimpleOps: v }))}
+                                            min={0}
+                                            max={10_000_000}
+                                            step={100_000}
+                                            unit="ops"
+                                            icon={<Database className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Basic file operations: reading/downloading existing blobs.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> GET requests to serve files, downloading attachments, streaming video, or accessing stored assets via blob URLs.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Blob Advanced Operations"
+                                            value={vercelInputs.blobAdvancedOps}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, blobAdvancedOps: v }))}
+                                            min={0}
+                                            max={1_000_000}
+                                            step={10_000}
+                                            unit="ops"
+                                            icon={<Database className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Write operations: uploading, updating, deleting blobs.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> PUT/POST requests for file uploads, DELETE for cleanup, multipart uploads for large files, or metadata updates.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Blob Data Transfer"
+                                            value={vercelInputs.blobDataTransfer}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, blobDataTransfer: v }))}
+                                            min={0}
+                                            max={10000}
+                                            step={100}
+                                            unit="GB"
+                                            icon={<TrendingUp className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Bandwidth used transferring data to/from Vercel Blob storage.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Uploading files from clients, downloading large assets, video streaming, or serving user-generated content from blob storage.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Edge Config */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <Settings2 className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Edge Config</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Edge Config Reads"
+                                            value={vercelInputs.edgeConfigReads}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, edgeConfigReads: v }))}
+                                            min={0}
+                                            max={100_000_000}
+                                            step={1_000_000}
+                                            unit="reads"
+                                            icon={<Settings2 className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of times configuration data is read from Edge Config (ultra-low-latency key-value store).</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Feature flag checks, A/B test variants, geo-based routing rules, maintenance mode toggles, or dynamic config loaded in Middleware/Edge Functions.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Edge Config Writes"
+                                            value={vercelInputs.edgeConfigWrites}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, edgeConfigWrites: v }))}
+                                            min={0}
+                                            max={100_000}
+                                            step={1_000}
+                                            unit="writes"
+                                            icon={<Settings2 className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of configuration updates/writes to Edge Config.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Updating feature flags, changing A/B test percentages, enabling/disabling features, or modifying routing rules via dashboard or API without redeployment.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ISR */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <RefreshCw className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">ISR (Incremental Static Regeneration)</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="ISR Reads"
+                                            value={vercelInputs.isrReads}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, isrReads: v }))}
+                                            min={0}
+                                            max={100_000_000}
+                                            step={1_000_000}
+                                            unit="reads"
+                                            icon={<RefreshCw className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of times pre-generated ISR pages are served from cache.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Next.js pages with revalidate or on-demand revalidation. Serves cached static HTML until revalidation period expires or manual revalidation triggered.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="ISR Writes"
+                                            value={vercelInputs.isrWrites}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, isrWrites: v }))}
+                                            min={0}
+                                            max={10_000_000}
+                                            step={100_000}
+                                            unit="writes"
+                                            icon={<RefreshCw className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of page regenerations (rebuilds) for ISR pages.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Background revalidation after revalidate time expires, on-demand revalidation via revalidatePath/revalidateTag, or CMS webhook-triggered updates.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Vercel Sandbox */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <SiNextdotjs className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Vercel Sandbox</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Sandbox Active CPU Time"
+                                            value={vercelInputs.sandboxActiveCpuTime}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, sandboxActiveCpuTime: v }))}
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            unit="hours"
+                                            icon={<Activity className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.128 per hour after 5 hours included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Total CPU execution time consumed by Sandbox environments.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Sandbox Provisioned Memory"
+                                            value={vercelInputs.sandboxProvisionedMemory}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, sandboxProvisionedMemory: v }))}
+                                            min={0}
+                                            max={2000}
+                                            step={10}
+                                            unit="GB-hrs"
+                                            icon={<Database className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.0106 per GB-hour after 420 GB-hrs included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Amount of RAM allocated to sandbox environments × execution duration.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Sandbox Creations"
+                                            value={vercelInputs.sandboxCreations}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, sandboxCreations: v }))}
+                                            min={0}
+                                            max={10_000_000}
+                                            step={10_000}
+                                            unit="creations"
+                                            icon={<Activity className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.60 per 1M creations after 5K included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of sandbox environments created.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Sandbox Network"
+                                            value={vercelInputs.sandboxNetwork}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, sandboxNetwork: v }))}
+                                            min={0}
+                                            max={1000}
+                                            step={10}
+                                            unit="GB"
+                                            icon={<TrendingUp className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.15 per GB after 20 GB included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Network bandwidth used by sandbox environments.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Vercel Workflow */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <GitBranch className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Vercel Workflow</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Workflow Steps"
+                                            value={vercelInputs.steps}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, steps: v }))}
+                                            min={0}
+                                            max={10_000_000}
+                                            step={10_000}
+                                            unit="steps"
+                                            icon={<Activity className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> $2.50 per 100K steps after 50K included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of workflow steps executed.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Workflow Storage"
+                                            value={vercelInputs.storage}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, storage: v }))}
+                                            min={0}
+                                            max={1000}
+                                            step={10}
+                                            unit="GB"
+                                            icon={<HardDrive className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> $0.50 per GB after 1 GB included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Storage used by workflow executions.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Firewall */}
+                                <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                    <div className="flex items-center gap-3">
+                                        <Shield className="h-5 w-5 text-primary" />
+                                        <h3 className="text-lg font-semibold">Vercel Firewall</h3>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="Rate Limiting (Allowed Requests)"
+                                            value={vercelInputs.rateLimitingRequests}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, rateLimitingRequests: v }))}
+                                            min={0}
+                                            max={1000}
+                                            step={10}
+                                            unit="M reqs"
+                                            icon={<Activity className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> Starting at $0.50 per 1M allowed requests after 1M included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Total requests that pass rate limiting checks (requests within allowed limits).</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Protecting API endpoints, login pages, form submissions. Charges apply for requests that are evaluated and allowed (not for blocked requests).</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <InputSlider
+                                            label="BotID Deep Analysis Checks"
+                                            value={vercelInputs.botId || 0}
+                                            onValueChange={(v) => setVercelInputs(prev => ({ ...prev, botId: v > 0 ? v : undefined }))}
+                                            min={0}
+                                            max={100_000}
+                                            step={1000}
+                                            unit="checks"
+                                            icon={<Shield className="h-4 w-4" />}
+                                        />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-primary/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> $1 per 1K Deep Analysis checks (Basic checks included)</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of advanced bot detection checks performed.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Advanced bot detection and analysis beyond basic checks. Helps identify sophisticated bots, scrapers, and automated attacks.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Vercel Results */}
+                            <div className="space-y-6">
+                                <div className="sticky top-6 space-y-6">
+                                    <div className="rounded-3xl border border-border/60 bg-gradient-to-br from-card via-card/95 to-primary/5 p-6 shadow-lg">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <SiNextdotjs className="h-6 w-6 text-primary" />
+                                            <h3 className="text-xl font-bold">
+                                                {vercelPlan === "hobby" ? "Vercel Hobby" : vercelPlan === "pro" ? "Vercel Pro" : "Vercel Enterprise"}
+                                            </h3>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Estimated Monthly Cost</p>
+                                                <p className="text-4xl font-bold text-primary">${vercelCost.total.toFixed(2)}</p>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3 text-sm">
+                                                <div className="rounded-xl bg-muted/30 p-3">
+                                                    <p className="text-muted-foreground">Seats ({vercelTeamMembers}x)</p>
+                                                    <p className="font-semibold">${vercelCost.basePrice}</p>
+                                                </div>
+                                                <div className="rounded-xl bg-muted/30 p-3">
+                                                    <p className="text-muted-foreground">Usage</p>
+                                                    <p className="font-semibold">${vercelCost.usageCharges.toFixed(2)}</p>
+                                                </div>
+                                                <div className="rounded-xl bg-emerald-500/10 p-3 col-span-2">
+                                                    <p className="text-emerald-600 dark:text-emerald-400">Credits Applied</p>
+                                                    <p className="font-semibold text-emerald-600 dark:text-emerald-400">-${vercelCost.creditsApplied.toFixed(2)}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="rounded-3xl border border-border/60 bg-card p-6 space-y-3 max-h-[600px] overflow-y-auto">
+                                        <h4 className="font-semibold flex items-center gap-2">
+                                            <Info className="h-4 w-4" />
+                                            Cost Breakdown
+                                        </h4>
+                                        {vercelCost.breakdown
+                                            .filter(item => item.value !== 0)
+                                            .map((item, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={cn(
+                                                        "flex items-center justify-between p-3 rounded-xl text-sm",
+                                                        item.category === "Base" && "bg-primary/10",
+                                                        item.category === "Credits" && "bg-emerald-500/10",
+                                                        !["Base", "Credits"].includes(item.category) && "bg-muted/40"
+                                                    )}
+                                                >
+                                                    <div>
+                                                        <p className="font-medium">{item.label}</p>
+                                                        {item.included && (
+                                                            <p className="text-xs text-muted-foreground">
+                                                                Included: {typeof item.included === 'number'
+                                                                    ? item.included.toLocaleString()
+                                                                    : item.included}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <p className={cn(
+                                                        "font-semibold",
+                                                        item.value < 0 && "text-emerald-600"
+                                                    )}>
+                                                        ${Math.abs(item.value).toFixed(2)}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="cloudflare" className="mt-6 space-y-6">
+                        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+                            {/* All Cloudflare Services Stacked */}
+                            <div className="space-y-6">
+                                {/* Workers + KV Section */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={setWorkersFreePlan}
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition",
+                                                    workersKvPlan === "free"
+                                                        ? "border-orange-500 bg-orange-500/10 text-orange-500"
+                                                        : "border-border bg-card text-muted-foreground hover:border-orange-500/50 hover:bg-orange-500/5"
+                                                )}
+                                            >
+                                                Workers Free
+                                            </button>
+                                            <button
+                                                onClick={setWorkersPaidPlan}
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition",
+                                                    workersKvPlan === "paid"
+                                                        ? "border-orange-500 bg-orange-500/10 text-orange-500"
+                                                        : "border-border bg-card text-muted-foreground hover:border-orange-500/50 hover:bg-orange-500/5"
+                                                )}
+                                            >
+                                                Workers Paid
+                                            </button>
+                                            <button
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition cursor-default",
+                                                    workersKvPlan === "custom"
+                                                        ? "border-orange-500 bg-orange-500/10 text-orange-500"
+                                                        : "border-border bg-card text-muted-foreground/60"
+                                                )}
+                                            >
+                                                Workers Paid Custom
+                                            </button>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setCloudflareInputs(prev => ({
+                                                    ...prev,
+                                                    workerRequests: 0,
+                                                    cpuTimeMs: 0,
+                                                    kvReads: 0,
+                                                    kvWrites: 0,
+                                                    kvStorageGb: 0,
+                                                }))
+                                            }}
+                                            className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition hover:border-orange-500 hover:bg-orange-500/5 hover:text-orange-500"
+                                        >
+                                            <RotateCcw className="h-4 w-4" />
+                                            Reset
+                                        </button>
+                                    </div>
+
+                                    {/* Workers */}
+                                    <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                        <div className="flex items-center gap-3">
+                                            <SiCloudflare className="h-5 w-5 text-orange-500" />
+                                            <h3 className="text-lg font-semibold">Cloudflare Workers</h3>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="Worker Requests"
+                                                value={cloudflareInputs.workerRequests}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, workerRequests: v }))}
+                                                min={1_000_000}
+                                                max={200_000_000}
+                                                step={1_000_000}
+                                                unit="requests"
+                                                icon={<Activity className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $0.30 per 1M requests after 10M included</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Total HTTP requests handled by Cloudflare Workers (serverless functions at the edge).</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> API routes, Next.js with OpenNext adapter, SSR pages, middleware, cron jobs, webhooks, or any JavaScript/TypeScript code running on Workers runtime.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="CPU Time"
+                                                value={cloudflareInputs.cpuTimeMs}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, cpuTimeMs: v }))}
+                                                min={0}
+                                                max={500_000_000}
+                                                step={1_000_000}
+                                                unit="ms"
+                                                icon={<Activity className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $0.02 per 1M CPU milliseconds after 30M included</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Total CPU execution time consumed by Workers (measured in milliseconds).</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> All Worker computation: JSON parsing, encryption, data transformation, API calls processing, HTML rendering. Heavy operations like crypto or large loops increase CPU time.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* KV Storage */}
+                                    <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                        <div className="flex items-center gap-3">
+                                            <Database className="h-5 w-5 text-orange-500" />
+                                            <h3 className="text-lg font-semibold">KV Storage</h3>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="KV Reads"
+                                                value={cloudflareInputs.kvReads}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, kvReads: v }))}
+                                                min={0}
+                                                max={100_000_000}
+                                                step={1_000_000}
+                                                unit="reads"
+                                                icon={<Database className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $0.50 per 1M reads after 10M included</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Number of key-value read operations from Workers KV (distributed key-value store).</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> Reading cached data, user sessions, feature flags, configuration, or any key-value lookups in Workers. Extremely fast for read-heavy workloads (eventually consistent).</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="KV Writes"
+                                                value={cloudflareInputs.kvWrites}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, kvWrites: v }))}
+                                                min={0}
+                                                max={10_000_000}
+                                                step={100_000}
+                                                unit="writes"
+                                                icon={<Database className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $5.00 per 1M writes after 1M included</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Number of write/update/delete operations to Workers KV.</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> Storing cache data, updating user preferences, saving session tokens, or any key-value writes. Note: Writes are more expensive than reads in KV.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="KV Storage"
+                                                value={cloudflareInputs.kvStorageGb}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, kvStorageGb: v }))}
+                                                min={0}
+                                                max={100}
+                                                step={1}
+                                                unit="GB"
+                                                icon={<HardDrive className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $0.50 per GB/month</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Total data stored in Workers KV namespace(s).</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> Persistent storage for cached content, user data, session storage, or configuration. Each key can store up to 25MB.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* D1 Database Section */}
+                                <div className="space-y-4">
+
+
+                                    {/* D1 Database */}
+                                    <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <Database className="h-5 w-5 text-orange-500" />
+                                            <h3 className="text-lg font-semibold">D1 Database (SQLite)</h3>
+                                            {/* <button
+                                                onClick={() => {
+                                                    setCloudflareInputs(prev => ({
+                                                        ...prev,
+                                                        d1RowsRead: 0,
+                                                        d1RowsWritten: 0,
+                                                        d1StorageGb: 0,
+                                                    }))
+                                                }}
+                                                className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition hover:border-orange-500 hover:bg-orange-500/5 hover:text-orange-500"
+                                            >
+                                                <RotateCcw className="h-4 w-4" />
+                                                Reset
+                                            </button> */}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="D1 Rows Read"
+                                                value={cloudflareInputs.d1RowsRead}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, d1RowsRead: v }))}
+                                                min={0}
+                                                max={50_000_000_000}
+                                                step={1_000_000_000}
+                                                unit="rows"
+                                                icon={<Database className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $0.001 per 1M rows after 25B included</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Number of database rows read from D1 (serverless SQLite at the edge).</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> SELECT queries, JOIN operations, data retrieval in Workers. Includes all rows scanned (not just returned rows). Perfect for relational data at the edge.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="D1 Rows Written"
+                                                value={cloudflareInputs.d1RowsWritten}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, d1RowsWritten: v }))}
+                                                min={0}
+                                                max={100_000_000}
+                                                step={1_000_000}
+                                                unit="rows"
+                                                icon={<Database className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $1.00 per 1M rows after 50M included</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Number of rows inserted, updated, or deleted in D1 database.</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> INSERT, UPDATE, DELETE operations. Creating users, updating records, deleting data, or any write transactions in your SQLite database.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="D1 Storage"
+                                                value={cloudflareInputs.d1StorageGb}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, d1StorageGb: v }))}
+                                                min={0}
+                                                max={50}
+                                                step={1}
+                                                unit="GB"
+                                                icon={<HardDrive className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $0.75 per GB/month</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Total database size (all tables, indexes, data) in D1.</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> All stored data in SQLite database: user tables, application data, indexes, metadata. Grows with data volume and index complexity.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                {/* R2 Storage Section */}
+                                <div className="space-y-4 rounded-3xl border border-border/60 bg-card/50 p-6">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <h3 className="text-lg font-semibold flex items-center gap-3">
+                                            <HardDrive className="h-5 w-5 text-orange-500" />
+                                            R2 Storage
+                                        </h3>
+                                        <button
+                                            onClick={() => {
+                                                setCloudflareInputs(prev => ({
+                                                    ...prev,
+                                                    r2StorageGb: 0,
+                                                    r2ClassAOps: 0,
+                                                    r2ClassBOps: 0,
+                                                }))
+                                            }}
+                                            className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:border-orange-500 hover:bg-orange-500/5 hover:text-orange-500"
+                                        >
+                                            <RotateCcw className="h-4 w-4" />
+                                            Reset
+                                        </button>
+                                    </div>
+                                    <div className="space-y-5 pt-4 border-t border-border/60">
+                                        <InputSlider label="R2 Storage" value={cloudflareInputs.r2StorageGb} onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, r2StorageGb: v }))} min={0} max={1000} step={10} unit="GB" icon={<HardDrive className="h-4 w-4" />} />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> $0.004 per GB/month</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Total data stored in R2 storage.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> All data stored in R2 storage: user data, application data, logs, or any other data stored in R2 storage.</p>
+                                        </div>
+
+                                        <InputSlider label="R2 Class A Ops (writes/lists)" value={cloudflareInputs.r2ClassAOps} onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, r2ClassAOps: v }))} min={0} max={10000000} step={100000} unit="ops" icon={<Database className="h-4 w-4" />} />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> $4.50 per 1M writes/lists after 1M included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of write/list operations to R2 storage.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Writing objects to R2 storage or listing objects in R2 storage.</p>
+                                        </div>
+
+                                        <InputSlider label="R2 Class B Ops (reads)" value={cloudflareInputs.r2ClassBOps} onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, r2ClassBOps: v }))} min={0} max={100000000} step={1000000} unit="ops" icon={<Database className="h-4 w-4" />} />
+                                        <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                            <p><span className="font-semibold text-foreground">Cost:</span> $0.36 per 1M reads after 10M included</p>
+                                            <p><span className="font-semibold text-foreground">What is it:</span> Number of read operations from R2 storage.</p>
+                                            <p><span className="font-semibold text-foreground">Used by:</span> Reading objects from R2 storage.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                {/* Images Section */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={setImagesFreePlan}
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition",
+                                                    imagesPlan === "free"
+                                                        ? "border-orange-500 bg-orange-500/10 text-orange-500"
+                                                        : "border-border bg-card text-muted-foreground hover:border-orange-500/50 hover:bg-orange-500/5"
+                                                )}
+                                            >
+                                                Images Free
+                                            </button>
+                                            <button
+                                                onClick={setImagesPaidPlan}
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition",
+                                                    imagesPlan === "paid"
+                                                        ? "border-orange-500 bg-orange-500/10 text-orange-500"
+                                                        : "border-border bg-card text-muted-foreground hover:border-orange-500/50 hover:bg-orange-500/5"
+                                                )}
+                                            >
+                                                Images Paid
+                                            </button>
+                                            <button
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition cursor-default",
+                                                    imagesPlan === "custom"
+                                                        ? "border-orange-500 bg-orange-500/10 text-orange-500"
+                                                        : "border-border bg-card text-muted-foreground/60"
+                                                )}
+                                            >
+                                                Images Custom
+                                            </button>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setCloudflareInputs(prev => ({
+                                                    ...prev,
+                                                    imageTransformations: 0,
+                                                    imagesStored: 0,
+                                                    imagesDelivered: 0,
+                                                }))
+                                            }}
+                                            className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition hover:border-orange-500 hover:bg-orange-500/5 hover:text-orange-500"
+                                        >
+                                            <RotateCcw className="h-4 w-4" />
+                                            Reset
+                                        </button>
+                                    </div>
+
+                                    {/* Images */}
+                                    <div className="rounded-3xl border border-border/60 bg-card/70 p-6 space-y-5">
+                                        <div className="flex items-center gap-3">
+                                            <ImageIcon className="h-5 w-5 text-orange-500" />
+                                            <h3 className="text-lg font-semibold">Cloudflare Images</h3>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="Image Transformations (unique)"
+                                                value={cloudflareInputs.imageTransformations}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, imageTransformations: v }))}
+                                                min={0}
+                                                max={100_000}
+                                                step={1_000}
+                                                unit="transforms"
+                                                icon={<ImageIcon className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $0.50 per 1M transforms after 5k included</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Number of unique image transformations/variants created per month.</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> Resizing, format conversion (WebP/AVIF), quality adjustments, cropping operations. Each unique combination (size + format + quality) counts once.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="Images Stored"
+                                                value={cloudflareInputs.imagesStored}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, imagesStored: v }))}
+                                                min={0}
+                                                max={500_000}
+                                                step={10_000}
+                                                unit="images"
+                                                icon={<HardDrive className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $5.00 per 100k images</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Total number of original source images stored in Cloudflare Images.</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> User uploads, product images, profile pictures, or any images managed via Cloudflare Images service. Includes originals only (variants don't count).</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <InputSlider
+                                                label="Images Delivered"
+                                                value={cloudflareInputs.imagesDelivered}
+                                                onValueChange={(v) => setCloudflareInputs(prev => ({ ...prev, imagesDelivered: v }))}
+                                                min={0}
+                                                max={1_000_000}
+                                                step={10_000}
+                                                unit="delivered"
+                                                icon={<TrendingUp className="h-4 w-4" />}
+                                            />
+                                            <div className="pl-4 pb-2 text-xs text-muted-foreground space-y-1 border-l-2 border-orange-500/20">
+                                                <p><span className="font-semibold text-foreground">Cost:</span> $1.00 per 100k delivered</p>
+                                                <p><span className="font-semibold text-foreground">What is it:</span> Number of image requests served to end users (all variants combined).</p>
+                                                <p><span className="font-semibold text-foreground">Used by:</span> Every image view on your site/app. Includes all transformations, cached and non-cached requests. Higher traffic = more deliveries.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Cloudflare Results Panel (Shared for all services) */}
+                            <div className="space-y-6">
+                                <div className="sticky top-6 space-y-6">
+                                    <div className="rounded-3xl border border-border/60 bg-gradient-to-br from-card via-card/95 to-orange-500/5 p-6 shadow-lg">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <SiCloudflare className="h-6 w-6 text-orange-500" />
+                                            <h3 className="text-xl font-bold">
+                                                Cloudflare Workers {cloudflarePlan === "free" ? "Free" : cloudflarePlan === "paid" ? "Paid" : "Custom"}
+                                            </h3>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Estimated Monthly Cost</p>
+                                                <p className="text-4xl font-bold text-orange-500">${cloudflareCost.total.toFixed(2)}</p>
+                                            </div>
+                                            <div className="flex gap-4 text-sm">
+                                                <div>
+                                                    <p className="text-muted-foreground">Base</p>
+                                                    <p className="font-semibold">${cloudflareCost.basePrice}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-muted-foreground">Usage</p>
+                                                    <p className="font-semibold">${cloudflareCost.usageCharges.toFixed(2)}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm text-emerald-600 bg-emerald-500/10 px-3 py-2 rounded-lg">
+                                                <TrendingUp className="h-4 w-4" />
+                                                <span className="font-medium">Zero bandwidth charges</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="rounded-3xl border border-border/60 bg-card p-6 space-y-3 max-h-[600px] overflow-y-auto">
+                                        <h4 className="font-semibold flex items-center gap-2">
+                                            <Info className="h-4 w-4" />
+                                            Cost Breakdown
+                                        </h4>
+                                        {cloudflareCost.breakdown
+                                            .filter(item => item.value !== 0)
+                                            .map((item, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={cn(
+                                                        "flex items-center justify-between p-3 rounded-xl text-sm",
+                                                        item.category === "Base" && "bg-orange-500/10",
+                                                        item.category !== "Base" && "bg-muted/40"
+                                                    )}
+                                                >
+                                                    <div>
+                                                        <p className="font-medium">{item.label}</p>
+                                                        {item.included && (
+                                                            <p className="text-xs text-muted-foreground">
+                                                                Included: {typeof item.included === 'number'
+                                                                    ? item.included.toLocaleString()
+                                                                    : item.included}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <p className="font-semibold">${item.value.toFixed(2)}</p>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </TabsContent>
+                </Tabs>
+
+                <div className="rounded-3xl border border-border/60 bg-gradient-to-br from-card to-muted/20 p-8">
+                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <Calculator className="h-6 w-6 text-primary" />
+                        Cost Comparison
+                    </h2>
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <div className={cn(
+                            "rounded-2xl border-2 p-6 transition",
+                            provider === "vercel" ? "border-primary bg-primary/5" : "border-border bg-card"
+                        )}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <SiNextdotjs className="h-6 w-6" />
+                                <h3 className="text-xl font-bold">
+                                    {vercelPlan === "hobby" ? "Vercel Hobby" : vercelPlan === "pro" ? "Vercel Pro" : "Vercel Enterprise"}
+                                </h3>
+                            </div>
+                            <p className="text-3xl font-bold mb-3">${vercelCost.total.toFixed(2)}/mo</p>
+                            <ul className="space-y-2 text-sm text-muted-foreground">
+                                {vercelPlan === "hobby" ? (
+                                    <>
+                                        <li>• Free tier</li>
+                                        <li>• 1M Edge Requests/month</li>
+                                        <li>• 100 GB Data Transfer/month</li>
+                                        <li>• Personal projects</li>
+                                        <li>• Community support</li>
+                                    </>
+                                ) : vercelPlan === "pro" ? (
+                                    <>
+                                        <li>• $20/user/month ({vercelTeamMembers} {vercelTeamMembers === 1 ? 'user' : 'users'})</li>
+                                        <li>• $20 usage credit per user</li>
+                                        <li>• Global CDN included</li>
+                                        <li>• Image optimization built-in</li>
+                                        <li>• Premium Next.js support</li>
+                                        <li>• Bandwidth charges apply</li>
+                                    </>
+                                ) : (
+                                    <>
+                                        <li>• Custom pricing</li>
+                                        <li>• Enterprise features</li>
+                                        <li>• Dedicated support</li>
+                                        <li>• Advanced security</li>
+                                        <li>• SLA guarantees</li>
+                                    </>
+                                )}
+                            </ul>
+                        </div>
+
+                        <div className={cn(
+                            "rounded-2xl border-2 p-6 transition",
+                            provider === "cloudflare" ? "border-orange-500 bg-orange-500/5" : "border-border bg-card"
+                        )}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <SiCloudflare className="h-6 w-6 text-orange-500" />
+                                <h3 className="text-xl font-bold">
+                                    Cloudflare Workers {cloudflarePlan === "free" ? "Free" : cloudflarePlan === "paid" ? "Paid" : "Custom"}
+                                </h3>
+                            </div>
+                            <p className="text-3xl font-bold mb-3">${cloudflareCost.total.toFixed(2)}/mo</p>
+                            <ul className="space-y-2 text-sm text-muted-foreground">
+                                {cloudflarePlan === "free" ? (
+                                    <>
+                                        <li>• Free tier</li>
+                                        <li>• 100k requests/day</li>
+                                        <li>• Zero bandwidth/egress fees</li>
+                                        <li>• 275+ edge locations</li>
+                                        <li>• Limited resources</li>
+                                    </>
+                                ) : cloudflarePlan === "paid" ? (
+                                    <>
+                                        <li>• $5 base subscription</li>
+                                        <li>• Zero bandwidth/egress fees</li>
+                                        <li>• 275+ edge locations</li>
+                                        <li>• R2, D1, KV included</li>
+                                        <li>• Pay only for CPU time</li>
+                                    </>
+                                ) : (
+                                    <>
+                                        <li>• Custom pricing</li>
+                                        <li>• Enterprise features</li>
+                                        <li>• Advanced security</li>
+                                        <li>• Dedicated support</li>
+                                    </>
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 p-4 rounded-xl bg-muted/40 text-sm text-muted-foreground">
+                        <p className="flex items-start gap-2">
+                            <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                            <span>
+                                These calculations are based on official pricing documentation from Vercel and Cloudflare.
+                                Actual costs may vary based on usage patterns, caching efficiency, and promotional credits.
+                                Prices exclude taxes and are subject to change by the providers.
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </>
+
+    )
+}
+
+

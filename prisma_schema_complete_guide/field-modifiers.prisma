@@ -1,0 +1,35 @@
+
+
+
+model FieldModifiers {
+
+    // Example value:
+    // 1
+    defaultId Int @id @default(autoincrement())
+    
+
+    // tags String[]
+    // Purpose: Stores an array of text values, allowing multiple related items in one field.
+
+    // General use cases:
+    // - Assigning multiple labels to an entity
+    // - Categorizing or grouping related data points
+    // - Storing multiple keywords or descriptors
+
+    // Example value:
+    // ["urgent", "backend", "api"]
+    tags      String[]
+
+
+    // bio String?
+    // Purpose: Stores optional descriptive text; can be null if no description is provided.
+
+    // General use cases:
+    // - Adding an extended description for an entity
+    // - Providing supplementary or contextual information
+    // - Recording additional notes or remarks
+
+    // Example value:
+    // "Handles all backend API requests with priority."
+    bio       String?
+}
