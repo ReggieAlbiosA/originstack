@@ -8,6 +8,7 @@ import {
     type TableOfContentsItem as TocItem,
 } from "@/components/page/client/table-of-contents";
 import { PageNavigation, PageNavigationNext, PageNavigationPrevious } from "@/components/page/server/page-navigation";
+import React from "react";
 
 export const metadata = {
     title: "Getting Started - Caching and Revalidating in Next.js",
@@ -31,8 +32,18 @@ const tableOfContentsData = [
 
 export default function CachingRevalidatingLayout({
     fetch,
+    updateTag,
+    cacheTag,
+    revalidateTag,
+    revalidatePath,
+    quotePostsDemo
 }: {
     fetch: React.ReactNode;
+    updateTag: React.ReactNode;
+    cacheTag: React.ReactNode;
+    revalidateTag: React.ReactNode;
+    revalidatePath: React.ReactNode;
+    quotePostsDemo: React.ReactNode
 }) {
     return (
         <>
@@ -56,7 +67,7 @@ export default function CachingRevalidatingLayout({
 
             <div className="relative min-h-screen py-8">
                 {/* Main content container with responsive grid */}
-                <div className="xl:grid xl:grid-cols-[1fr_minmax(250px,285.996px)] ">
+                <div className="grid xl:grid-cols-[1fr_240px]">
 
                     <main className="space-y-8 max-w-[1200px] mx-auto px-4 xl:px-0 bg-white dark:bg-zinc-900">
                         <Article
@@ -71,7 +82,12 @@ export default function CachingRevalidatingLayout({
                         >
 
                             <div className="space-y-8">
-                                {fetch}
+                                {/* {fetch} */}
+                                {/* {cacheTag}
+                                {updateTag}
+                                {revalidateTag}
+                                {revalidatePath} */}
+                                {quotePostsDemo}
                             </div>
                         </Article>
 

@@ -1,0 +1,12 @@
+// supabase setup
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"] // Add this line
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+    schemas   = ["originstack-supabase-schema"] // Add this line
+}

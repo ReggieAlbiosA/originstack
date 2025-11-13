@@ -154,7 +154,7 @@ export function TableOfContents({
                         data-toc-mobile
                         style={{ top: `${topOffset}px` }}
                         className={cn(
-                            'xl:hidden sticky z-40 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md',
+                            'xl:hidden  block sticky z-40 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md',
                             'border-b border-zinc-200 dark:border-zinc-800',
                             className
                         )}

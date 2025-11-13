@@ -1,0 +1,10 @@
+{
+    "app": {
+        "inputs": [
+            "./prisma/modules/base.prisma",
+            "./prisma/modules/quote-posts.prisma"
+        ],
+        "fragments": {},
+        "output": "./prisma/schema.prisma"
+    }
+}

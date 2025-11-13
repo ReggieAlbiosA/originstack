@@ -62,3 +62,5 @@ FREE_DNS_TESTING_GUIDE.md
 TIERED_CACHE_SETUP.md
 enable-regional-cache.sh
 /Networking_And_Infrastructure
+/prisma_schema_complete_guide
+/tests

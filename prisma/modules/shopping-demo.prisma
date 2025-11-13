@@ -1,0 +1,59 @@
+// ============================================================================
+// SHOPPING DEMO SCHEMA - For Caching & Revalidation Demos
+// ============================================================================
+
+// Product Catalog
+model Product {
+    id          String   @id @default(uuid())
+    name        String
+    description String?
+    price       Float
+    category    String // electronics, clothing, food, etc.
+    stock       Int      @default(0)
+    featured    Boolean  @default(false)
+    imageUrl    String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@map("products")
+    @@schema("originstack-supabase-schema")
+}
+
+// Shopping Cart Items
+model CartItem {
+    id        String   @id @default(uuid())
+    userId    String // Demo user ID
+    productId String
+    quantity  Int      @default(1)
+    addedAt   DateTime @default(now())
+
+    @@map("cart_items")
+    @@schema("originstack-supabase-schema")
+}
+
+// Orders
+model Order {
+    id          String   @id @default(uuid())
+    userId      String // Demo user ID
+    items       Json // Snapshot of cart items at checkout
+    totalAmount Float
+    status      String   @default("pending") // pending, completed, cancelled
+    createdAt   DateTime @default(now())
+
+    @@map("orders")
+    @@schema("originstack-supabase-schema")
+}
+
+// User Profile & Wishlist
+model UserProfile {
+    id        String   @id @default(uuid())
+    userId    String   @unique // Demo user ID
+    name      String
+    email     String   @unique
+    wishlist  Json? // Array of product IDs
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("user_profiles")
+    @@schema("originstack-supabase-schema")
+}
